@@ -157,9 +157,12 @@ a { color: inherit; text-decoration: none; }
 }
 
 .top-user-menu {
-  position: relative;
+  position: fixed;
+  top: 26px;
+  right: 28px;
+  z-index: 30;
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .top-user-avatar {
@@ -192,8 +195,7 @@ a { color: inherit; text-decoration: none; }
   transition: opacity .16s ease, transform .16s ease;
 }
 
-.top-user-menu:focus-within .top-user-panel,
-.top-user-menu:hover .top-user-panel {
+.top-user-menu.user-menu-open .top-user-panel {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);

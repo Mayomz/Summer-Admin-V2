@@ -176,19 +176,6 @@ function setupCurrentUserUI() {
     if (!button.closest(".top-user-menu")) button.remove();
   });
 
-  const sidebar = document.querySelector(".sidebar");
-  if (sidebar && !sidebar.querySelector(".sidebar-user")) {
-    sidebar.insertAdjacentHTML("beforeend", `
-      <div class="sidebar-user" title="${escapeText(name)} - ${escapeText(role)}">
-        ${avatar}
-        <span class="sidebar-user-meta">
-          <strong>${escapeText(name)}</strong>
-          <small>${escapeText(role)}</small>
-        </span>
-      </div>
-    `);
-  }
-
   const topbar = document.querySelector(".topbar");
   let actions = document.querySelector(".top-actions");
   if (!actions && topbar) {
@@ -211,6 +198,15 @@ function setupCurrentUserUI() {
         </div>
       </div>
     `);
+    const menu = actions.querySelector(".top-user-menu");
+    const avatarButton = menu.querySelector(".top-user-avatar");
+    avatarButton.addEventListener("click", event => {
+      event.stopPropagation();
+      menu.classList.toggle("user-menu-open");
+    });
+    document.addEventListener("click", event => {
+      if (!menu.contains(event.target)) menu.classList.remove("user-menu-open");
+    });
   }
 }
 
