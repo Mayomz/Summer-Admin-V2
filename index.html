@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FiveM Ticket Desk</title>
-  <link rel="stylesheet" href="assets/styles.css?v=20260617-topbar-action-safe">
+  <link rel="stylesheet" href="assets/styles.css?v=20260617-evidence-clips">
 </head>
 <body data-page="tickets">
   <div class="app-shell">
@@ -150,6 +150,14 @@
 
       <section class="subform">
         <div class="section-title">
+          <h3>ลิงก์คลิปหลักฐาน</h3>
+          <button type="button" class="ghost-button" id="addClipLink">+ เพิ่มคลิป</button>
+        </div>
+        <div id="clipLinks" class="stack-list"></div>
+      </section>
+
+      <section class="subform">
+        <div class="section-title">
           <h3>โหวตช่วยตัดสิน</h3>
         </div>
         <div class="vote-grid">
@@ -208,6 +216,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/site-config.js"></script>
-  <script src="assets/app.js?v=20260617-topbar-action-safe"></script>
+  <script src="assets/app.js?v=20260617-evidence-clips"></script>
 </body>
 </html>

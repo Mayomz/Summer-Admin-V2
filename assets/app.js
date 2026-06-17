@@ -373,7 +373,7 @@ function copyText(text) {
 }
 
 function archiveSheetRows() {
-  const headers = ["เลข TK", "ผู้แจ้ง", "เวลาบันทึก", "หมวดหมู่", "ความสำคัญ", "กำหนดส่ง", "สถานะ", "ผลตัดสิน", "ลิงก์ Discord", "ลิงก์รูป", "โหวตผิด", "โหวตไม่ผิด", "ผู้โหวต", "หมายเหตุ", "เวลาเข้าคลัง"];
+  const headers = ["เลข TK", "ผู้แจ้ง", "เวลาบันทึก", "หมวดหมู่", "ความสำคัญ", "กำหนดส่ง", "สถานะ", "ผลตัดสิน", "ลิงก์ Discord", "ลิงก์รูป", "ลิงก์คลิป", "โหวตผิด", "โหวตไม่ผิด", "ผู้โหวต", "หมายเหตุ", "เวลาเข้าคลัง"];
   const rows = state.archive.map(ticket => {
     const counts = getVoteCounts(ticket);
     return [
@@ -387,6 +387,7 @@ function archiveSheetRows() {
       ticket.verdict,
       (ticket.discordLinks || []).join(" | "),
       (ticket.imageLinks || []).join(" | "),
+      (ticket.clipLinks || []).join(" | "),
       counts.guilty,
       counts.notGuilty,
       (ticket.adminVotes || []).map(vote => `${vote.admin}:${vote.vote}`).join(" | "),
@@ -584,8 +585,10 @@ function resetTicketForm(ticket = null) {
   byId("note").value = ticket?.note || "";
   byId("discordLinks").innerHTML = "";
   byId("imageLinks").innerHTML = "";
+  byId("clipLinks").innerHTML = "";
   (ticket?.discordLinks?.length ? ticket.discordLinks : [""]).forEach(link => dynamicRow(byId("discordLinks"), link, true));
   (ticket?.imageLinks?.length ? ticket.imageLinks : [""]).forEach(link => dynamicRow(byId("imageLinks"), link, false, renderImagePreview));
+  (ticket?.clipLinks?.length ? ticket.clipLinks : [""]).forEach(link => dynamicRow(byId("clipLinks"), link, true));
   renderImagePreview();
 }
 
@@ -604,6 +607,7 @@ function ticketFromForm() {
     verdict: oldTicket?.verdict || "รอโหวต",
     discordLinks: getRowValues("discordLinks"),
     imageLinks: getRowValues("imageLinks"),
+    clipLinks: getRowValues("clipLinks"),
     votes: {
       guilty: counts.guilty,
       notGuilty: counts.notGuilty
@@ -704,6 +708,20 @@ function renderDetail(ticket) {
       </div>
       <div class="detail-image-grid">
         ${(ticket.imageLinks || []).map(url => `<button class="evidence-thumb" data-zoom-image="${escapeText(url)}"><img src="${escapeText(url)}" alt="หลักฐาน" loading="lazy"></button>`).join("") || "<p>ยังไม่มีรูปหลักฐาน</p>"}
+      </div>
+    </section>
+
+    <section class="detail-panel detail-clips-panel">
+      <div class="section-title">
+        <h3>คลิปหลักฐาน</h3>
+      </div>
+      <div class="detail-links">
+        ${(ticket.clipLinks || []).map(link => `
+          <div class="link-row">
+            <a href="${escapeText(link)}" target="_blank" rel="noreferrer">${escapeText(link)}</a>
+            <button class="ghost-button" data-copy-detail="${escapeText(link)}">Copy</button>
+          </div>
+        `).join("") || "<p>ยังไม่มีคลิปหลักฐาน</p>"}
       </div>
     </section>
 
@@ -893,6 +911,7 @@ function initTickets() {
   byId("statusFilter").addEventListener("change", renderTickets);
   byId("addDiscordLink").addEventListener("click", () => dynamicRow(byId("discordLinks"), "", true));
   byId("addImageLink").addEventListener("click", () => dynamicRow(byId("imageLinks"), "", false, renderImagePreview));
+  byId("addClipLink").addEventListener("click", () => dynamicRow(byId("clipLinks"), "", true));
   byId("ticketForm").addEventListener("submit", event => {
     event.preventDefault();
     const ticket = ticketFromForm();
