@@ -1064,13 +1064,12 @@ strong {
 }
 
 .sidebar-hover-expand {
-  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-columns: 48px minmax(0, 1fr);
 }
 .sidebar-hover-expand .sidebar {
   display: grid;
-  grid-template-rows: 52px auto 1fr 48px;
-  padding-inline: 8px;
-  padding-block: 8px 14px;
+  grid-template-rows: 54px auto 1fr 44px;
+  padding: 0;
   align-items: center;
   justify-items: center;
   gap: 0;
@@ -1079,22 +1078,22 @@ strong {
 .sidebar-hover-expand .sidebar::before {
   content: "";
   position: absolute;
-  top: 60px;
+  top: 54px;
   left: 0;
   right: 0;
   height: 1px;
   background: var(--line);
 }
 .sidebar-hover-expand .brand {
-  width: 36px;
-  min-height: 36px;
+  width: 48px;
+  min-height: 54px;
   justify-content: center;
 }
 .sidebar-hover-expand .brand-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  font-size: 11px;
 }
 .sidebar-hover-expand .brand > span:not(.brand-mark),
 .sidebar-hover-expand .nav-label {
@@ -1104,20 +1103,22 @@ strong {
 }
 .sidebar-hover-expand .nav {
   align-self: start;
-  width: 36px;
-  padding-top: 14px;
+  width: 48px;
+  padding-top: 8px;
+  gap: 6px;
 }
 .sidebar-hover-expand .nav a {
-  width: 36px;
-  min-height: 36px;
-  border-radius: 8px;
+  width: 32px;
+  min-height: 32px;
+  margin-inline: auto;
+  border-radius: 7px;
   justify-content: center;
   gap: 0;
   padding-inline: 0;
 }
 .sidebar-hover-expand .nav a::before {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   margin: 0;
 }
 .sidebar-hover-expand .connection-light {
@@ -1125,12 +1126,18 @@ strong {
 }
 .sidebar-hover-expand .sidebar-user {
   align-self: end;
-  width: 36px;
-  min-height: 36px;
+  width: 48px;
+  min-height: 44px;
   justify-content: center;
   padding: 0;
   background: transparent;
   border-color: transparent;
+}
+.sidebar-hover-expand .sidebar-user .user-avatar {
+  width: 30px;
+  height: 30px;
+  flex-basis: 30px;
+  font-size: 11px;
 }
 .sidebar-hover-expand .sidebar-user-meta {
   max-width: 0;
@@ -1172,10 +1179,12 @@ strong {
   align-self: auto;
   width: 100%;
   padding-top: 48px;
+  gap: 4px;
 }
 .sidebar-hover-expand.sidebar-expanded .nav a {
   width: auto;
   min-height: 42px;
+  margin-inline: 0;
   justify-content: flex-start;
   gap: 12px;
   padding: 9px 10px;
@@ -1188,6 +1197,12 @@ strong {
   padding-inline: 7px;
   background: #101216;
   border-color: #2a2d34;
+}
+.sidebar-hover-expand.sidebar-expanded .sidebar-user .user-avatar {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+  font-size: 12px;
 }
 .sidebar-hover-expand.sidebar-expanded .sidebar-user-meta {
   display: grid;
