@@ -1151,7 +1151,7 @@ strong {
 }
 .sidebar-hover-expand.sidebar-expanded .sidebar {
   display: flex;
-  padding-top: 30px;
+  padding-top: 0;
   padding-inline: 14px;
   align-items: stretch;
   justify-items: stretch;
@@ -1162,7 +1162,7 @@ strong {
 }
 .sidebar-hover-expand.sidebar-expanded .brand {
   width: auto;
-  min-height: auto;
+  min-height: 120px;
   justify-content: flex-start;
 }
 .sidebar-hover-expand.sidebar-expanded .brand-mark {
@@ -1180,7 +1180,7 @@ strong {
 .sidebar-hover-expand.sidebar-expanded .nav {
   align-self: auto;
   width: 100%;
-  padding-top: 48px;
+  padding-top: 12px;
   gap: 4px;
 }
 .sidebar-hover-expand.sidebar-expanded .nav a {
