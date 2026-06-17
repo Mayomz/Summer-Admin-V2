@@ -173,6 +173,7 @@ h3 { margin-bottom: 0; font-size: 16px; }
 .danger-button:hover { background: #ffe4e6; }
 .icon-button {
   width: 40px;
+  min-width: 40px;
   padding: 0;
   display: grid;
   place-items: center;
@@ -372,35 +373,55 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
 }
 
 .modal {
-  width: min(980px, calc(100% - 24px));
+  width: min(980px, calc(100% - 32px));
+  max-height: calc(100vh - 32px);
   border: 0;
   padding: 0;
   border-radius: 12px;
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 .modal::backdrop { background: rgba(17,24,39,.42); backdrop-filter: blur(2px); }
-.modal-card { padding: 24px; }
+.modal-card {
+  max-height: calc(100vh - 32px);
+  padding: 24px;
+  overflow: auto;
+}
 .modal-head {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
-.form-grid, .vote-grid {
+.form-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 14px;
+  align-items: end;
+}
+.vote-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 220px));
   gap: 14px;
 }
 .subform {
-  margin: 18px 0;
+  margin: 18px 0 0;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--panel-soft);
 }
+.modal-card > label {
+  margin-top: 18px;
+}
+.modal-card > label textarea {
+  min-height: 84px;
+}
 .section-title {
   justify-content: space-between;
   margin-bottom: 12px;
+  min-height: 40px;
 }
 .stack-list {
   display: grid;
@@ -408,8 +429,13 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
 }
 .dynamic-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) 72px 56px;
   gap: 8px;
+  align-items: center;
+}
+.dynamic-row .danger-button,
+.dynamic-row .ghost-button {
+  padding: 0 10px;
 }
 .image-preview {
   display: grid;
@@ -477,6 +503,7 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
 .modal-actions {
   justify-content: flex-end;
   margin-top: 18px;
+  padding-top: 18px;
 }
 
 .two-column {
@@ -608,6 +635,7 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   }
   .metric-grid, .form-grid, .two-column, .detail-grid { grid-template-columns: 1fr 1fr; }
   .shortcut-grid { grid-template-columns: 1fr; }
+  .vote-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .login-panel, .topbar { align-items: stretch; flex-direction: column; }
   .connection-light { margin-top: 8px; }
 }
