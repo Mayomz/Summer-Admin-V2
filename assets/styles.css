@@ -648,6 +648,13 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   margin-bottom: 12px;
   min-height: 40px;
 }
+.dashboard-latest-head {
+  min-height: 54px;
+  align-items: center;
+}
+.dashboard-latest-head h2 {
+  margin-bottom: 0;
+}
 .stack-list {
   display: grid;
   gap: 10px;
