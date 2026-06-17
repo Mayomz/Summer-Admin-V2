@@ -990,10 +990,21 @@ strong {
 }
 
 .topbar {
+  position: relative;
   align-items: flex-start;
   min-height: 82px;
   padding-bottom: 18px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 0;
+}
+
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: calc(-1 * (100vw - 100% - 30px));
+  right: -30px;
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
 }
 
 .login-panel,
