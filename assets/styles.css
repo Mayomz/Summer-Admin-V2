@@ -278,6 +278,9 @@ label { display: grid; gap: 7px; color: #374151; font-weight: 700; }
 .workspace {
   padding: 16px;
 }
+.workspace + .workspace {
+  margin-top: 18px;
+}
 
 .toolbar {
   margin-bottom: 14px;
@@ -514,6 +517,31 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   grid-template-columns: 1fr auto;
   margin-top: 16px;
 }
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.shortcut-card {
+  display: grid;
+  gap: 6px;
+  min-height: 98px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-soft);
+}
+.shortcut-card:hover {
+  border-color: #bfdbfe;
+  background: #f8fbff;
+}
+.shortcut-card strong {
+  color: var(--ink);
+}
+.shortcut-card span {
+  color: var(--muted);
+  font-size: 14px;
+}
 .permission-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(120px, 1fr));
@@ -548,6 +576,7 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .metric-grid, .form-grid, .two-column, .detail-grid { grid-template-columns: 1fr 1fr; }
+  .shortcut-grid { grid-template-columns: 1fr; }
   .login-panel, .topbar { align-items: stretch; flex-direction: column; }
   .connection-light { margin-top: 8px; }
 }

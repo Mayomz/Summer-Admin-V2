@@ -118,6 +118,9 @@ function setupNavigation() {
       link.style.display = "none";
     }
   });
+  document.querySelectorAll("[data-admin-only]").forEach(item => {
+    item.hidden = !canAccess("admin");
+  });
 }
 
 function updateConnectionLight(status = null) {
