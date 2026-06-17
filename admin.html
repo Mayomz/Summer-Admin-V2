@@ -29,13 +29,30 @@
       <section class="workspace">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>ID</th><th>ยศ</th><th>สิทธิ์แบบ Checkbox</th><th>สถานะ</th><th></th></tr></thead>
+            <thead><tr><th>ID</th><th>ยศ</th><th>หน้าที่เข้าถึงได้</th><th>สถานะ</th><th></th></tr></thead>
             <tbody id="userRows"></tbody>
           </table>
         </div>
       </section>
     </main>
   </div>
+  <dialog class="modal" id="permissionModal">
+    <section class="modal-card">
+      <header class="modal-head">
+        <div>
+          <p class="eyebrow">Access Pages</p>
+          <h2 id="permissionTitle">จัดการสิทธิ์</h2>
+        </div>
+        <button class="icon-button close" type="button" data-close-permission title="ปิด" aria-label="ปิด"></button>
+      </header>
+      <input type="hidden" id="permissionUserId">
+      <div class="permission-editor" id="permissionEditor"></div>
+      <footer class="modal-actions">
+        <button class="ghost-button" type="button" data-close-permission>ยกเลิก</button>
+        <button class="primary-button" type="button" id="savePermissions">บันทึกสิทธิ์</button>
+      </footer>
+    </section>
+  </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/site-config.js"></script>
   <script src="assets/app.js"></script>

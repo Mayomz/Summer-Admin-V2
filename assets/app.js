@@ -70,7 +70,20 @@ const pageLabels = {
 function normalizeRole(role) {
   if (role === "Supervisor") return "SuperAdmin";
   if (role === "Viewer") return "Guest";
-  return ["SuperAdmin", "Admin", "Guest"].includes(role) ? role : "Guest";
+  return ["SuperAdmin", "Admin", "Guest", "Custom"].includes(role) ? role : "Guest";
+}
+
+function pagesToRole(pages = []) {
+  const sorted = [...pages].sort().join(",");
+  if (sorted === [...rolePages.SuperAdmin].sort().join(",")) return "SuperAdmin";
+  if (sorted === [...rolePages.Admin].sort().join(",")) return "Admin";
+  if (!pages.length) return "Guest";
+  return "Custom";
+}
+
+function getUserPages(user) {
+  if (Array.isArray(user?.pages)) return user.pages;
+  return rolePages[normalizeRole(user?.role)] || [];
 }
 
 function normalizeUsers() {
@@ -78,14 +91,15 @@ function normalizeUsers() {
     id: user.id || crypto.randomUUID(),
     userId: user.userId || user.name || "",
     passwordHash: user.passwordHash || "",
-    role: normalizeRole(user.role),
+    role: pagesToRole(getUserPages(user)),
+    pages: getUserPages(user),
     active: user.active !== false
   })).filter(user => user.userId);
 }
 
 function canAccess(pageName = page) {
   if (pageName === "login" || pageName === "register") return true;
-  return rolePages[state.session?.role]?.includes(pageName) || false;
+  return (state.session?.pages || rolePages[state.session?.role] || []).includes(pageName);
 }
 
 function redirectHomeForRole(role) {
@@ -101,6 +115,7 @@ function syncSessionRole() {
     return;
   }
   state.session.role = normalizeRole(user.role);
+  state.session.pages = getUserPages(user);
   state.session.name = user.userId;
 }
 
@@ -114,7 +129,7 @@ function setupNavigation() {
       : href.includes("config") ? "config"
       : href.includes("stats") ? "stats"
       : "tickets";
-    if (!rolePages[state.session?.role]?.includes(targetPage)) {
+    if (!canAccess(targetPage)) {
       link.style.display = "none";
     }
   });
@@ -334,7 +349,7 @@ function initLogin() {
       message.textContent = "บัญชีนี้ถูกปิดใช้งาน";
       return;
     }
-    state.session = { userId: user.userId, name: user.userId, role: normalizeRole(user.role) };
+    state.session = { userId: user.userId, name: user.userId, role: normalizeRole(user.role), pages: getUserPages(user) };
     saveState({ localOnly: true });
     if (state.session.role === "Guest") {
       message.textContent = "บัญชีนี้ยังเป็น Guest ไม่สามารถเข้าหน้าใดได้";
@@ -363,9 +378,10 @@ function initRegister() {
       userId,
       passwordHash: await hashPassword(byId("registerPassword").value),
       role,
+      pages: rolePages[role],
       active: true
     });
-    state.session = { userId, name: userId, role };
+    state.session = { userId, name: userId, role, pages: rolePages[role] };
     saveState();
     if (role === "SuperAdmin") {
       window.location.href = "index.html";
@@ -756,53 +772,31 @@ function initArchive() {
 
 function initAdmin() {
   normalizeUsers();
-  const superAdminCount = () => state.users.filter(user => user.role === "SuperAdmin" && user.active).length;
-  const pagesToRole = pages => {
-    const sorted = [...pages].sort().join(",");
-    if (sorted === [...rolePages.SuperAdmin].sort().join(",")) return "SuperAdmin";
-    if (sorted === [...rolePages.Admin].sort().join(",")) return "Admin";
-    return "Guest";
+  const adminAccessCount = () => state.users.filter(user => user.active && getUserPages(user).includes("admin")).length;
+  const pageSummary = user => {
+    const pages = getUserPages(user);
+    if (!pages.length) return "ไม่มีสิทธิ์";
+    if (pages.length === Object.keys(pageLabels).length) return "ทุกหน้า";
+    return pages.map(pageKey => pageLabels[pageKey]).join(", ");
   };
   const render = () => {
     byId("userRows").innerHTML = state.users.map(user => `
       <tr>
-        <td><strong>${escapeText(user.userId)}</strong></td>
+        <td><button class="link-button" data-edit-permissions="${user.id}">${escapeText(user.userId)}</button></td>
         <td><span class="badge wait">${escapeText(user.role)}</span></td>
-        <td><div class="permission-grid">
-          ${Object.entries(pageLabels).map(([pageKey, label]) => `
-            <label><input type="checkbox" data-permission="${user.id}" value="${pageKey}" ${rolePages[user.role].includes(pageKey) ? "checked" : ""}>${label}</label>
-          `).join("")}
-        </div></td>
+        <td>${escapeText(pageSummary(user))}</td>
         <td><span class="badge ${user.active ? "ok" : "no"}">${user.active ? "ใช้งาน" : "ปิด"}</span></td>
         <td><div class="row-actions"><button data-toggle="${user.id}">สลับสถานะ</button><button data-remove="${user.id}">ลบ</button></div></td>
       </tr>
     `).join("");
-    byId("userRows").querySelectorAll("[data-permission]").forEach(checkbox => checkbox.addEventListener("change", () => {
-      const user = state.users.find(item => item.id === checkbox.dataset.permission);
-      if (!user) return;
-      const checkedPages = [...byId("userRows").querySelectorAll(`[data-permission="${user.id}"]:checked`)].map(input => input.value);
-      const nextRole = pagesToRole(checkedPages);
-      if (user.role === "SuperAdmin" && nextRole !== "SuperAdmin" && superAdminCount() <= 1) {
-        alert("ต้องมี SuperAdmin ที่ใช้งานอยู่อย่างน้อย 1 คน");
-        checkbox.checked = true;
-        return;
-      }
-      user.role = nextRole;
-      if (state.session?.userId === user.userId) {
-        state.session.role = user.role;
-      }
-      saveState();
-      if (!canAccess("admin")) {
-        window.location.href = "login.html";
-        return;
-      }
-      render();
+    byId("userRows").querySelectorAll("[data-edit-permissions]").forEach(button => button.addEventListener("click", () => {
+      openPermissionModal(button.dataset.editPermissions);
     }));
     byId("userRows").querySelectorAll("[data-toggle]").forEach(button => button.addEventListener("click", () => {
       const user = state.users.find(item => item.id === button.dataset.toggle);
       if (!user) return;
-      if (user.active && user.role === "SuperAdmin" && superAdminCount() <= 1) {
-        alert("ปิด SuperAdmin คนสุดท้ายไม่ได้");
+      if (user.active && getUserPages(user).includes("admin") && adminAccessCount() <= 1) {
+        alert("ปิดบัญชีที่จัดการสิทธิ์ได้คนสุดท้ายไม่ได้");
         return;
       }
       user.active = !user.active;
@@ -819,8 +813,8 @@ function initAdmin() {
     byId("userRows").querySelectorAll("[data-remove]").forEach(button => button.addEventListener("click", () => {
       const user = state.users.find(item => item.id === button.dataset.remove);
       if (!user) return;
-      if (user.role === "SuperAdmin" && superAdminCount() <= 1) {
-        alert("ลบ SuperAdmin คนสุดท้ายไม่ได้");
+      if (getUserPages(user).includes("admin") && adminAccessCount() <= 1) {
+        alert("ลบบัญชีที่จัดการสิทธิ์ได้คนสุดท้ายไม่ได้");
         return;
       }
       if (!confirm(`ลบบัญชี ${user.userId} ใช่ไหม`)) return;
@@ -836,6 +830,41 @@ function initAdmin() {
       render();
     }));
   };
+  const openPermissionModal = userId => {
+    const user = state.users.find(item => item.id === userId);
+    if (!user) return;
+    byId("permissionUserId").value = user.id;
+    byId("permissionTitle").textContent = `สิทธิ์ของ ${user.userId}`;
+    byId("permissionEditor").innerHTML = Object.entries(pageLabels).map(([pageKey, label]) => `
+      <label><input type="checkbox" value="${pageKey}" ${getUserPages(user).includes(pageKey) ? "checked" : ""}>${label}</label>
+    `).join("");
+    byId("permissionModal").showModal();
+  };
+  document.querySelectorAll("[data-close-permission]").forEach(button => {
+    button.addEventListener("click", () => byId("permissionModal").close());
+  });
+  byId("savePermissions").addEventListener("click", () => {
+    const user = state.users.find(item => item.id === byId("permissionUserId").value);
+    if (!user) return;
+    const nextPages = [...byId("permissionEditor").querySelectorAll("input:checked")].map(input => input.value);
+    if (getUserPages(user).includes("admin") && !nextPages.includes("admin") && adminAccessCount() <= 1) {
+      alert("ต้องมีบัญชีที่จัดการสิทธิ์ได้อย่างน้อย 1 คน");
+      return;
+    }
+    user.pages = nextPages;
+    user.role = pagesToRole(nextPages);
+    if (state.session?.userId === user.userId) {
+      state.session.role = user.role;
+      state.session.pages = user.pages;
+    }
+    saveState();
+    byId("permissionModal").close();
+    if (!canAccess("admin")) {
+      window.location.href = "login.html";
+      return;
+    }
+    render();
+  });
   render();
 }
 
