@@ -589,10 +589,9 @@ function renderDetail(ticket) {
         <span>ไม่ผิด <b>${counts.notGuilty}</b></span>
       </div>
       <div class="head-vote-actions">
-        <button class="vote-icon-button down" data-cast-vote="ผิด" title="โหวตว่าผิด" aria-label="โหวตว่าผิด">ผิด</button>
-        <button class="vote-icon-button up" data-cast-vote="ไม่ผิด" title="โหวตว่าไม่ผิด" aria-label="โหวตว่าไม่ผิด">ไม่ผิด</button>
+        <button class="vote-icon-button down ${currentVote?.vote === "ผิด" ? "selected" : ""}" data-cast-vote="ผิด" title="โหวตว่าผิด" aria-label="โหวตว่าผิด">ผิด</button>
+        <button class="vote-icon-button up ${currentVote?.vote === "ไม่ผิด" ? "selected" : ""}" data-cast-vote="ไม่ผิด" title="โหวตว่าไม่ผิด" aria-label="โหวตว่าไม่ผิด">ไม่ผิด</button>
       </div>
-      <p>${currentVote ? `คุณโหวตแล้ว: ${escapeText(currentVote.vote)}` : "คุณยังไม่ได้โหวต"}</p>
     </div>
   `;
   byId("ticketDetailBody").innerHTML = `
