@@ -141,20 +141,8 @@ function setupNavigation() {
 function setupSidebarToggle() {
   const shell = document.querySelector(".app-shell");
   const sidebar = document.querySelector(".sidebar");
-  if (!shell || !sidebar || sidebar.querySelector("[data-sidebar-toggle]")) return;
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "sidebar-toggle";
-  button.dataset.sidebarToggle = "true";
-  button.title = "ย่อ/ขยายเมนู";
-  button.setAttribute("aria-label", "ย่อ/ขยายเมนู");
-  sidebar.insertBefore(button, sidebar.querySelector(".nav"));
-  const apply = collapsed => {
-    shell.classList.toggle("sidebar-collapsed", collapsed);
-    localStorage.setItem("fivemTicketSidebarCollapsed", collapsed ? "1" : "0");
-  };
-  apply(localStorage.getItem("fivemTicketSidebarCollapsed") === "1");
-  button.addEventListener("click", () => apply(!shell.classList.contains("sidebar-collapsed")));
+  if (!shell || !sidebar) return;
+  shell.classList.add("sidebar-hover-expand");
 }
 
 function updateConnectionLight(status = null) {
