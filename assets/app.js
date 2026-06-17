@@ -429,6 +429,7 @@ function seedData() {
       verdict: "รอโหวต",
       discordLinks: ["https://discord.com/channels/server/ticket-1001"],
       imageLinks: ["https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80"],
+      clipLinks: [],
       votes: { guilty: 3, notGuilty: 1 },
       adminVotes: [],
       note: "เคสทะเลาะวิวาทในเมือง"
@@ -445,6 +446,7 @@ function seedData() {
       verdict: "รอโหวต",
       discordLinks: ["https://discord.com/channels/server/ticket-1002"],
       imageLinks: [],
+      clipLinks: [],
       votes: { guilty: 0, notGuilty: 2 },
       adminVotes: [],
       note: ""
@@ -961,17 +963,20 @@ function initArchive() {
     byId("archiveRows").innerHTML = state.archive.filter(ticket => {
       const hay = `${ticket.tkNumber} ${ticket.reporter} ${ticket.category}`.toLowerCase();
       return hay.includes(search);
-    }).map(ticket => `
+    }).map(ticket => {
+      const links = [...(ticket.discordLinks || []), ...(ticket.clipLinks || [])];
+      return `
       <tr>
         <td><strong>${escapeText(ticket.tkNumber)}</strong></td>
         <td>${escapeText(ticket.reporter)}</td>
         <td>${escapeText(ticket.category)}</td>
         <td><span class="badge ${priorityClass(ticket.priority)}">${escapeText(ticket.priority)}</span></td>
         <td><span class="badge ${verdictClass(ticket.verdict)}">${escapeText(ticket.verdict)}</span></td>
-        <td>${ticket.discordLinks.map(link => `<button class="ghost-button" data-copy="${escapeText(link)}">Copy</button>`).join(" ")}</td>
+        <td>${links.map(link => `<button class="ghost-button" data-copy="${escapeText(link)}">Copy</button>`).join(" ") || "-"}</td>
         <td><div class="row-actions"><button data-view="${ticket.id}">ดู</button><button data-restore="${ticket.id}">ดึงกลับ</button><button data-delete="${ticket.id}">ลบ</button></div></td>
       </tr>
-    `).join("");
+    `;
+    }).join("");
     byId("archiveRows").querySelectorAll("[data-copy]").forEach(button => button.addEventListener("click", () => copyText(button.dataset.copy)));
     byId("archiveRows").querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => openDetail(button.dataset.view)));
     byId("archiveRows").querySelectorAll("[data-restore]").forEach(button => button.addEventListener("click", () => {
