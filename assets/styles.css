@@ -396,9 +396,20 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
 }
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 16px 14px;
   align-items: end;
+}
+.form-grid > label {
+  grid-column: span 3;
+  min-width: 0;
+}
+.form-grid > label.field-wide {
+  grid-column: span 4;
+}
+.form-grid input,
+.form-grid select {
+  min-width: 0;
 }
 .vote-grid {
   display: grid;
@@ -633,7 +644,10 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   .nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .metric-grid, .form-grid, .two-column, .detail-grid { grid-template-columns: 1fr 1fr; }
+  .metric-grid, .two-column, .detail-grid { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form-grid > label,
+  .form-grid > label.field-wide { grid-column: span 1; }
   .shortcut-grid { grid-template-columns: 1fr; }
   .vote-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .login-panel, .topbar { align-items: stretch; flex-direction: column; }
@@ -643,6 +657,8 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
 @media (max-width: 640px) {
   .main { padding: 18px 12px; }
   .nav, .metric-grid, .form-grid, .vote-grid, .two-column, .detail-grid { grid-template-columns: 1fr; }
+  .form-grid > label,
+  .form-grid > label.field-wide { grid-column: span 1; }
   .permission-editor { grid-template-columns: 1fr; }
   .dynamic-row { grid-template-columns: 1fr; }
   .toolbar { flex-wrap: wrap; }
