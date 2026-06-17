@@ -1070,7 +1070,7 @@ strong {
 }
 .sidebar-hover-expand .sidebar {
   display: grid;
-  grid-template-rows: 54px auto 1fr 44px;
+  grid-template-rows: 120px auto 1fr 44px;
   padding: 0;
   align-items: center;
   justify-items: center;
@@ -1080,7 +1080,7 @@ strong {
 .sidebar-hover-expand .sidebar::before {
   content: "";
   position: absolute;
-  top: 54px;
+  top: 120px;
   left: 0;
   right: 0;
   height: 1px;
@@ -1088,7 +1088,7 @@ strong {
 }
 .sidebar-hover-expand .brand {
   width: 48px;
-  min-height: 54px;
+  min-height: 120px;
   justify-content: center;
 }
 .sidebar-hover-expand .brand-mark {
@@ -1106,7 +1106,7 @@ strong {
 .sidebar-hover-expand .nav {
   align-self: start;
   width: 48px;
-  padding-top: 8px;
+  padding-top: 12px;
   gap: 6px;
 }
 .sidebar-hover-expand .nav a {
