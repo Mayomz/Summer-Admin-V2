@@ -893,6 +893,14 @@ body,
   background: var(--bg);
 }
 
+h1,
+h2,
+h3,
+p,
+strong {
+  color: var(--ink);
+}
+
 .app-shell {
   grid-template-columns: 244px minmax(0, 1fr);
   transition: grid-template-columns .18s ease;
