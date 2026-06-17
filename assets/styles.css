@@ -1235,7 +1235,12 @@ strong {
   align-items: flex-start;
   min-height: 82px;
   padding-bottom: 18px;
+  padding-right: 64px;
   border-bottom: 0;
+}
+
+.topbar .top-actions {
+  padding-right: 4px;
 }
 
 .topbar::after {
