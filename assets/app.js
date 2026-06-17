@@ -8,11 +8,7 @@ const defaultState = {
     { name: "บั๊กระบบ", color: "#d97706" },
     { name: "ร้องเรียนแอดมิน", color: "#2563eb" }
   ],
-  users: [
-    { id: crypto.randomUUID(), name: "Owner", role: "Supervisor", permissions: "ทั้งหมด", active: true },
-    { id: crypto.randomUUID(), name: "Admin A", role: "Admin", permissions: "Ticket, Archive", active: true },
-    { id: crypto.randomUUID(), name: "Viewer", role: "Viewer", permissions: "ดูข้อมูล", active: true }
-  ],
+  users: [],
   tickets: [],
   archive: [],
   config: {
@@ -40,7 +36,9 @@ function loadState() {
   base.config = { ...base.config, ...getSiteConfig() };
   if (!saved) return base;
   const parsed = JSON.parse(saved);
-  return { ...base, ...parsed, config: { ...base.config, ...(parsed.config || {}) } };
+  const loaded = { ...base, ...parsed, config: { ...base.config, ...(parsed.config || {}) } };
+  loaded.users = loaded.users || [];
+  return loaded;
 }
 
 function saveState(options = {}) {
@@ -52,6 +50,70 @@ function saveState(options = {}) {
 
 let state = loadState();
 const page = document.body.dataset.page;
+
+const rolePages = {
+  SuperAdmin: ["tickets", "admin", "archive", "backend", "config", "stats"],
+  Admin: ["tickets", "archive", "stats"],
+  Guest: []
+};
+
+function normalizeRole(role) {
+  if (role === "Supervisor") return "SuperAdmin";
+  if (role === "Viewer") return "Guest";
+  return ["SuperAdmin", "Admin", "Guest"].includes(role) ? role : "Guest";
+}
+
+function normalizeUsers() {
+  state.users = (state.users || []).map(user => ({
+    id: user.id || crypto.randomUUID(),
+    userId: user.userId || user.name || "",
+    passwordHash: user.passwordHash || "",
+    role: normalizeRole(user.role),
+    active: user.active !== false
+  })).filter(user => user.userId);
+}
+
+function rolePermissions(role) {
+  if (role === "SuperAdmin") return "ทุกหน้า + มอบสิทธิ์";
+  if (role === "Admin") return "Ticket, คลัง, สถิติ";
+  return "ยังไม่มีสิทธิ์เข้าถึง";
+}
+
+function canAccess(pageName = page) {
+  if (pageName === "login") return true;
+  return rolePages[state.session?.role]?.includes(pageName) || false;
+}
+
+function redirectHomeForRole(role) {
+  if (role === "SuperAdmin" || role === "Admin") window.location.href = "index.html";
+}
+
+function syncSessionRole() {
+  if (!state.session) return;
+  const user = state.users.find(item => item.userId === state.session.userId);
+  if (!user || !user.active) {
+    state.session = null;
+    saveState({ localOnly: true });
+    return;
+  }
+  state.session.role = normalizeRole(user.role);
+  state.session.name = user.userId;
+}
+
+function setupNavigation() {
+  document.querySelectorAll(".nav a").forEach(link => {
+    const href = link.getAttribute("href") || "";
+    const targetPage = href.includes("admin") ? "admin"
+      : href.includes("archive") ? "archive"
+      : href.includes("backend") ? "backend"
+      : href.includes("config") ? "config"
+      : href.includes("stats") ? "stats"
+      : "tickets";
+    if (!rolePages[state.session?.role]?.includes(targetPage)) {
+      link.style.display = "none";
+    }
+  });
+}
 
 function isSupabaseReady() {
   return state.config.provider === "supabase" && state.config.url && state.config.key && window.supabase;
@@ -90,6 +152,7 @@ async function pullRemoteState() {
       session: localSession,
       config: { ...state.config, ...(data.value.config || {}) }
     };
+    normalizeUsers();
     saveState({ localOnly: true });
   }
 }
@@ -112,7 +175,14 @@ async function pushRemoteState() {
 function requireSession() {
   if (page !== "login" && !state.session) {
     window.location.href = "login.html";
+    return false;
   }
+  if (page !== "login" && !canAccess()) {
+    alert("บัญชีนี้ไม่มีสิทธิ์เข้าหน้านี้");
+    window.location.href = "login.html";
+    return false;
+  }
+  return true;
 }
 
 function byId(id) {
@@ -156,7 +226,13 @@ function getVoteCounts(ticket) {
 }
 
 function getCurrentAdminName() {
-  return state.session?.name || "Unknown Admin";
+  return state.session?.userId || state.session?.name || "Unknown Admin";
+}
+
+async function hashPassword(password) {
+  const data = new TextEncoder().encode(password);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function escapeText(value = "") {
@@ -216,14 +292,62 @@ function setStorageMode() {
 }
 
 function initLogin() {
+  normalizeUsers();
   const form = byId("loginPageForm");
-  if (!form) return;
-  if (state.session) window.location.href = "index.html";
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    state.session = { name: byId("loginPageName").value.trim(), role: byId("loginPageRole").value };
-    saveState();
+  const registerForm = byId("registerForm");
+  const message = byId("loginMessage");
+  if (!form || !registerForm) return;
+  if (state.session?.role === "SuperAdmin" || state.session?.role === "Admin") {
     window.location.href = "index.html";
+    return;
+  }
+  if (state.session?.role === "Guest") {
+    message.textContent = "บัญชีนี้ยังเป็น Guest กรุณารอ SuperAdmin มอบสิทธิ์";
+  }
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    const userId = byId("loginUserId").value.trim();
+    const passwordHash = await hashPassword(byId("loginPassword").value);
+    const user = state.users.find(item => item.userId === userId && item.passwordHash === passwordHash);
+    if (!user) {
+      message.textContent = "ID หรือ Pass ไม่ถูกต้อง";
+      return;
+    }
+    if (!user.active) {
+      message.textContent = "บัญชีนี้ถูกปิดใช้งาน";
+      return;
+    }
+    state.session = { userId: user.userId, name: user.userId, role: normalizeRole(user.role) };
+    saveState({ localOnly: true });
+    if (state.session.role === "Guest") {
+      message.textContent = "บัญชีนี้ยังเป็น Guest ไม่สามารถเข้าหน้าใดได้";
+      return;
+    }
+    window.location.href = "index.html";
+  });
+  registerForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const userId = byId("registerUserId").value.trim();
+    if (state.users.some(user => user.userId === userId)) {
+      message.textContent = "ID นี้ถูกใช้แล้ว";
+      return;
+    }
+    const firstSuperAdmin = !state.users.some(user => user.role === "SuperAdmin" && user.passwordHash);
+    const role = firstSuperAdmin ? "SuperAdmin" : "Guest";
+    state.users.push({
+      id: crypto.randomUUID(),
+      userId,
+      passwordHash: await hashPassword(byId("registerPassword").value),
+      role,
+      active: true
+    });
+    state.session = { userId, name: userId, role };
+    saveState();
+    if (role === "SuperAdmin") {
+      window.location.href = "index.html";
+      return;
+    }
+    message.textContent = "สมัครแล้ว แต่ยังเป็น Guest กรุณารอ SuperAdmin มอบสิทธิ์";
   });
 }
 
@@ -591,35 +715,81 @@ function initArchive() {
 }
 
 function initAdmin() {
+  normalizeUsers();
+  const superAdminCount = () => state.users.filter(user => user.role === "SuperAdmin" && user.active).length;
   const render = () => {
     byId("userRows").innerHTML = state.users.map(user => `
       <tr>
-        <td><strong>${escapeText(user.name)}</strong></td>
-        <td>${escapeText(user.role)}</td>
-        <td>${escapeText(user.permissions)}</td>
+        <td><strong>${escapeText(user.userId)}</strong></td>
+        <td>
+          <select data-role="${user.id}">
+            <option value="SuperAdmin" ${user.role === "SuperAdmin" ? "selected" : ""}>SuperAdmin</option>
+            <option value="Admin" ${user.role === "Admin" ? "selected" : ""}>Admin</option>
+            <option value="Guest" ${user.role === "Guest" ? "selected" : ""}>Guest</option>
+          </select>
+        </td>
+        <td>${escapeText(rolePermissions(user.role))}</td>
         <td><span class="badge ${user.active ? "ok" : "no"}">${user.active ? "ใช้งาน" : "ปิด"}</span></td>
         <td><div class="row-actions"><button data-toggle="${user.id}">สลับสถานะ</button><button data-remove="${user.id}">ลบ</button></div></td>
       </tr>
     `).join("");
+    byId("userRows").querySelectorAll("[data-role]").forEach(select => select.addEventListener("change", () => {
+      const user = state.users.find(item => item.id === select.dataset.role);
+      if (!user) return;
+      if (user.role === "SuperAdmin" && select.value !== "SuperAdmin" && superAdminCount() <= 1) {
+        alert("ต้องมี SuperAdmin ที่ใช้งานอยู่อย่างน้อย 1 คน");
+        select.value = "SuperAdmin";
+        return;
+      }
+      user.role = select.value;
+      if (state.session?.userId === user.userId) {
+        state.session.role = user.role;
+      }
+      saveState();
+      if (!canAccess("admin")) {
+        window.location.href = "login.html";
+        return;
+      }
+      render();
+    }));
     byId("userRows").querySelectorAll("[data-toggle]").forEach(button => button.addEventListener("click", () => {
       const user = state.users.find(item => item.id === button.dataset.toggle);
+      if (!user) return;
+      if (user.active && user.role === "SuperAdmin" && superAdminCount() <= 1) {
+        alert("ปิด SuperAdmin คนสุดท้ายไม่ได้");
+        return;
+      }
       user.active = !user.active;
+      if (!user.active && state.session?.userId === user.userId) {
+        state.session = null;
+      }
       saveState();
+      if (!state.session) {
+        window.location.href = "login.html";
+        return;
+      }
       render();
     }));
     byId("userRows").querySelectorAll("[data-remove]").forEach(button => button.addEventListener("click", () => {
+      const user = state.users.find(item => item.id === button.dataset.remove);
+      if (!user) return;
+      if (user.role === "SuperAdmin" && superAdminCount() <= 1) {
+        alert("ลบ SuperAdmin คนสุดท้ายไม่ได้");
+        return;
+      }
+      if (!confirm(`ลบบัญชี ${user.userId} ใช่ไหม`)) return;
       state.users = state.users.filter(item => item.id !== button.dataset.remove);
+      if (state.session?.userId === user.userId) {
+        state.session = null;
+      }
       saveState();
+      if (!state.session) {
+        window.location.href = "login.html";
+        return;
+      }
       render();
     }));
   };
-  byId("addUser").addEventListener("click", () => {
-    const name = prompt("ชื่อผู้ใช้");
-    if (!name) return;
-    state.users.push({ id: crypto.randomUUID(), name, role: "Admin", permissions: "Ticket", active: true });
-    saveState();
-    render();
-  });
   render();
 }
 
@@ -700,9 +870,14 @@ const initializers = {
 };
 
 async function boot() {
-  requireSession();
   await pullRemoteState();
-  if (page !== "login") initLogout();
+  normalizeUsers();
+  syncSessionRole();
+  if (page !== "login") {
+    if (!requireSession()) return;
+    setupNavigation();
+    initLogout();
+  }
   initializers[page]?.();
 }
 

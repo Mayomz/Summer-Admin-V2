@@ -22,17 +22,24 @@
         <p class="muted">สำหรับแอดมินที่ดูแล Ticket ใน Discord ของเซิร์ฟเวอร์ FiveM</p>
       </div>
       <form class="login-form" id="loginPageForm">
-        <label>ชื่อผู้ใช้งาน
-          <input type="text" id="loginPageName" placeholder="เช่น Admin A" required>
+        <label>ID
+          <input type="text" id="loginUserId" placeholder="เช่น admin01" autocomplete="username" required>
         </label>
-        <label>บทบาท
-          <select id="loginPageRole">
-            <option value="Admin">Admin</option>
-            <option value="Supervisor">Supervisor</option>
-            <option value="Viewer">Viewer</option>
-          </select>
+        <label>Pass
+          <input type="password" id="loginPassword" placeholder="รหัสผ่าน" autocomplete="current-password" required>
         </label>
         <button class="primary-button" type="submit">เข้าสู่ระบบ</button>
+      </form>
+      <div class="divider"><span>หรือ</span></div>
+      <form class="login-form" id="registerForm">
+        <label>ID สำหรับสมัคร
+          <input type="text" id="registerUserId" placeholder="ตั้ง ID" autocomplete="username" required>
+        </label>
+        <label>Pass สำหรับสมัคร
+          <input type="password" id="registerPassword" placeholder="ตั้งรหัสผ่าน" autocomplete="new-password" required>
+        </label>
+        <button class="ghost-button" type="submit">สมัครเข้าใช้งาน</button>
+        <p class="muted" id="loginMessage"></p>
       </form>
     </section>
   </main>
