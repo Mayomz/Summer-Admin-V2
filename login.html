@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>เข้าสู่ระบบ | FiveM Ticket Desk</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="login">
+  <main class="login-screen">
+    <section class="login-card">
+      <a class="brand dark" href="login.html">
+        <span class="brand-mark">FT</span>
+        <span>
+          <strong>FiveM Ticket</strong>
+          <small>Admin Desk</small>
+        </span>
+      </a>
+      <div>
+        <p class="eyebrow">Admin Login</p>
+        <h1>เข้าสู่ระบบจัดการ Ticket</h1>
+        <p class="muted">สำหรับแอดมินที่ดูแล Ticket ใน Discord ของเซิร์ฟเวอร์ FiveM</p>
+      </div>
+      <form class="login-form" id="loginPageForm">
+        <label>ชื่อผู้ใช้งาน
+          <input type="text" id="loginPageName" placeholder="เช่น Admin A" required>
+        </label>
+        <label>บทบาท
+          <select id="loginPageRole">
+            <option value="Admin">Admin</option>
+            <option value="Supervisor">Supervisor</option>
+            <option value="Viewer">Viewer</option>
+          </select>
+        </label>
+        <button class="primary-button" type="submit">เข้าสู่ระบบ</button>
+      </form>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/site-config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

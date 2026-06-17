@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>สถิติ | FiveM Ticket Desk</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="stats">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><span class="brand-mark">FT</span><span><strong>FiveM Ticket</strong><small>Admin Desk</small></span></a>
+      <nav class="nav">
+        <a href="index.html" data-icon="ticket">จัดการ Ticket</a>
+        <a href="admin.html" data-icon="shield">สิทธิ์ผู้ใช้</a>
+        <a href="archive.html" data-icon="archive">คลังงาน</a>
+        <a href="backend.html" data-icon="layers">หมวดหมู่</a>
+        <a href="config.html" data-icon="database">ฐานข้อมูล</a>
+        <a class="active" href="stats.html" data-icon="chart">สถิติ</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><p class="eyebrow">Statistics</p><h1>สถิติแก๊งที่เปิด Ticket มากสุด</h1></div>
+        <button class="ghost-button" data-logout>ออกจากระบบ</button>
+      </header>
+      <section class="metric-grid">
+        <article class="metric"><span>Ticket ทั้งหมด</span><strong id="totalTickets">0</strong></article>
+        <article class="metric"><span>แก๊งที่เปิดเยอะสุด</span><strong id="topReporter">-</strong></article>
+        <article class="metric"><span>ผลผิด</span><strong id="guiltyTotal">0</strong></article>
+        <article class="metric"><span>ผลไม่ผิด</span><strong id="notGuiltyTotal">0</strong></article>
+      </section>
+      <section class="workspace">
+        <div class="chart-list" id="statsChart"></div>
+      </section>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/site-config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

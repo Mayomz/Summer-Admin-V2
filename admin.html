@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>สิทธิ์ผู้ใช้ | FiveM Ticket Desk</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="admin">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><span class="brand-mark">FT</span><span><strong>FiveM Ticket</strong><small>Admin Desk</small></span></a>
+      <nav class="nav">
+        <a href="index.html" data-icon="ticket">จัดการ Ticket</a>
+        <a class="active" href="admin.html" data-icon="shield">สิทธิ์ผู้ใช้</a>
+        <a href="archive.html" data-icon="archive">คลังงาน</a>
+        <a href="backend.html" data-icon="layers">หมวดหมู่</a>
+        <a href="config.html" data-icon="database">ฐานข้อมูล</a>
+        <a href="stats.html" data-icon="chart">สถิติ</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><p class="eyebrow">Access Control</p><h1>จัดการสิทธิ์ผู้ใช้</h1></div>
+        <div class="top-actions"><button class="ghost-button" data-logout>ออกจากระบบ</button><button class="primary-button" id="addUser">เพิ่มผู้ใช้</button></div>
+      </header>
+      <section class="workspace">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ชื่อ</th><th>บทบาท</th><th>สิทธิ์</th><th>สถานะ</th><th></th></tr></thead>
+            <tbody id="userRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/site-config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

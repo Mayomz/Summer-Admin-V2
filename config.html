@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ฐานข้อมูล | FiveM Ticket Desk</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="config">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><span class="brand-mark">FT</span><span><strong>FiveM Ticket</strong><small>Admin Desk</small></span></a>
+      <nav class="nav">
+        <a href="index.html" data-icon="ticket">จัดการ Ticket</a>
+        <a href="admin.html" data-icon="shield">สิทธิ์ผู้ใช้</a>
+        <a href="archive.html" data-icon="archive">คลังงาน</a>
+        <a href="backend.html" data-icon="layers">หมวดหมู่</a>
+        <a class="active" href="config.html" data-icon="database">ฐานข้อมูล</a>
+        <a href="stats.html" data-icon="chart">สถิติ</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><p class="eyebrow">Database Config</p><h1>เชื่อมฐานข้อมูลออนไลน์</h1></div>
+        <div class="top-actions"><button class="ghost-button" data-logout>ออกจากระบบ</button><button class="primary-button" id="saveConfig">บันทึกค่า</button></div>
+      </header>
+      <section class="workspace two-column">
+        <form class="panel-form" id="configForm">
+          <h2>ผู้ให้บริการ</h2>
+          <label>ประเภทฐานข้อมูล
+            <select id="dbProvider">
+              <option value="local">Local Browser Demo</option>
+              <option value="supabase">Supabase</option>
+              <option value="firebase">Firebase</option>
+              <option value="planetscale">PlanetScale</option>
+            </select>
+          </label>
+          <label>Project URL <input id="dbUrl" placeholder="https://project.supabase.co"></label>
+          <label>Public API Key <input id="dbKey" placeholder="ใช้ public anon key เท่านั้น"></label>
+          <label>ชื่อตารางกลาง <input id="dbTable" value="app_state"></label>
+        </form>
+        <article class="info-panel">
+          <h2>คำแนะนำฐานข้อมูลออนไลน์</h2>
+          <p>เมื่อใช้ GitHub Pages ให้ใส่ค่า Supabase ในไฟล์ assets/site-config.js ก่อนอัปขึ้น GitHub หรือใส่ผ่านหน้านี้ในเครื่องของผู้ใช้แต่ละคนก็ได้</p>
+          <div class="status-card">
+            <span>สถานะปัจจุบัน</span>
+            <strong id="configStatus">Local Browser Demo</strong>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/site-config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

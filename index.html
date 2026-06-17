@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FiveM Ticket Desk</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="tickets">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">FT</span>
+        <span>
+          <strong>FiveM Ticket</strong>
+          <small>Admin Desk</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <a class="active" href="index.html" data-icon="ticket">จัดการ Ticket</a>
+        <a href="admin.html" data-icon="shield">สิทธิ์ผู้ใช้</a>
+        <a href="archive.html" data-icon="archive">คลังงาน</a>
+        <a href="backend.html" data-icon="layers">หมวดหมู่</a>
+        <a href="config.html" data-icon="database">ฐานข้อมูล</a>
+        <a href="stats.html" data-icon="chart">สถิติ</a>
+      </nav>
+      <div class="side-note">
+        <span>โหมดบันทึก</span>
+        <strong id="storageMode">Local Browser</strong>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Ticket Operations</p>
+          <h1>ติดตามงานแอดมิน FiveM</h1>
+        </div>
+        <div class="top-actions">
+          <button class="ghost-button" data-logout>ออกจากระบบ</button>
+          <button class="icon-button" data-action="seed" title="เติมข้อมูลตัวอย่าง" aria-label="เติมข้อมูลตัวอย่าง"></button>
+          <button class="primary-button" data-open-modal="ticketModal">เพิ่ม Ticket</button>
+        </div>
+      </header>
+
+      <section class="metric-grid" aria-label="ภาพรวม Ticket">
+        <article class="metric">
+          <span>งานเปิดอยู่</span>
+          <strong id="openCount">0</strong>
+        </article>
+        <article class="metric">
+          <span>เร่งด่วน</span>
+          <strong id="urgentCount">0</strong>
+        </article>
+        <article class="metric">
+          <span>ครบกำหนดวันนี้</span>
+          <strong id="dueTodayCount">0</strong>
+        </article>
+        <article class="metric">
+          <span>รอตัดสิน</span>
+          <strong id="votePendingCount">0</strong>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <div class="toolbar">
+          <div class="searchbox">
+            <span></span>
+            <input type="search" id="ticketSearch" placeholder="ค้นหาเลข TK, ผู้แจ้ง, หมวดหมู่">
+          </div>
+          <select id="priorityFilter">
+            <option value="">ทุกความสำคัญ</option>
+            <option value="สูง">สูง</option>
+            <option value="กลาง">กลาง</option>
+            <option value="ต่ำ">ต่ำ</option>
+          </select>
+          <select id="statusFilter">
+            <option value="">ทุกสถานะ</option>
+            <option value="เปิดงาน">เปิดงาน</option>
+            <option value="กำลังตรวจสอบ">กำลังตรวจสอบ</option>
+            <option value="รอตัดสิน">รอตัดสิน</option>
+            <option value="เสร็จแล้ว">เสร็จแล้ว</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>เลข TK</th>
+                <th>ผู้แจ้ง</th>
+                <th>เวลาบันทึก</th>
+                <th>หมวดหมู่</th>
+                <th>ความสำคัญ</th>
+                <th>กำหนดส่ง</th>
+                <th>สถานะ</th>
+                <th>โหวต</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ticketRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="modal" id="ticketModal">
+    <form method="dialog" class="modal-card" id="ticketForm">
+      <header class="modal-head">
+        <div>
+          <p class="eyebrow">Ticket Form</p>
+          <h2 id="modalTitle">เพิ่ม Ticket</h2>
+        </div>
+        <button class="icon-button close" type="button" data-close-modal title="ปิด" aria-label="ปิด"></button>
+      </header>
+
+      <input type="hidden" id="ticketId">
+      <div class="form-grid">
+        <label>เลข TK
+          <input id="tkNumber" required placeholder="เช่น TK-1001">
+        </label>
+        <label>ผู้แจ้ง
+          <input id="reporter" required placeholder="ชื่อแก๊งหรือผู้เล่น">
+        </label>
+        <label>เวลาบันทึก
+          <input id="createdAt" type="datetime-local" required>
+        </label>
+        <label>หมวดหมู่
+          <select id="category" required></select>
+        </label>
+        <label>ความสำคัญ
+          <select id="priority" required>
+            <option>สูง</option>
+            <option>กลาง</option>
+            <option>ต่ำ</option>
+          </select>
+        </label>
+        <label>กำหนดส่ง
+          <input id="dueDate" type="date" required>
+        </label>
+        <label>สถานะ
+          <select id="status" required>
+            <option>เปิดงาน</option>
+            <option>กำลังตรวจสอบ</option>
+            <option>รอตัดสิน</option>
+            <option>เสร็จแล้ว</option>
+          </select>
+        </label>
+        <label>ผลตัดสิน
+          <select id="verdict">
+            <option value="รอโหวต">รอโหวต</option>
+            <option value="ผิด">ผิด</option>
+            <option value="ไม่ผิด">ไม่ผิด</option>
+          </select>
+        </label>
+      </div>
+
+      <section class="subform">
+        <div class="section-title">
+          <h3>ลิงก์ห้อง Discord</h3>
+          <button type="button" class="ghost-button" id="addDiscordLink">+ เพิ่มห้อง</button>
+        </div>
+        <div id="discordLinks" class="stack-list"></div>
+      </section>
+
+      <section class="subform">
+        <div class="section-title">
+          <h3>ลิงก์รูปหลักฐาน</h3>
+          <button type="button" class="ghost-button" id="addImageLink">+ เพิ่มรูป</button>
+        </div>
+        <div id="imageLinks" class="stack-list"></div>
+        <div id="imagePreview" class="image-preview"></div>
+      </section>
+
+      <section class="subform">
+        <div class="section-title">
+          <h3>โหวตช่วยตัดสิน</h3>
+        </div>
+        <div class="vote-grid">
+          <label>ผิด
+            <input id="voteGuilty" type="number" min="0" value="0">
+          </label>
+          <label>ไม่ผิด
+            <input id="voteNotGuilty" type="number" min="0" value="0">
+          </label>
+        </div>
+      </section>
+
+      <label>หมายเหตุ
+        <textarea id="note" rows="3" placeholder="สรุปเหตุการณ์หรือรายละเอียดเพิ่มเติม"></textarea>
+      </label>
+
+      <footer class="modal-actions">
+        <button class="ghost-button" type="button" data-close-modal>ยกเลิก</button>
+        <button class="primary-button" value="default" type="submit">บันทึก Ticket</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/site-config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
