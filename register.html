@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>สมัครสมาชิก | FiveM Ticket Desk</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="register">
+  <main class="login-screen">
+    <section class="login-card">
+      <a class="brand dark" href="login.html">
+        <span class="brand-mark">FT</span>
+        <span>
+          <strong>FiveM Ticket</strong>
+          <small>Admin Desk</small>
+        </span>
+      </a>
+      <div>
+        <p class="eyebrow">Register</p>
+        <h1>สมัครเข้าใช้งาน</h1>
+        <p class="muted">สมัครด้วย ID และ Pass เท่านั้น บัญชีใหม่จะเป็น Guest จนกว่า SuperAdmin จะมอบสิทธิ์</p>
+      </div>
+      <form class="login-form" id="registerForm">
+        <label>ID
+          <input type="text" id="registerUserId" placeholder="ตั้ง ID" autocomplete="username" required>
+        </label>
+        <label>Pass
+          <input type="password" id="registerPassword" placeholder="ตั้งรหัสผ่าน" autocomplete="new-password" required>
+        </label>
+        <button class="primary-button" type="submit">สมัครเข้าใช้งาน</button>
+        <p class="muted" id="loginMessage"></p>
+      </form>
+      <a class="ghost-button center-button" href="login.html">กลับไปหน้า Login</a>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/site-config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
