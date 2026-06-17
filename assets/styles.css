@@ -123,6 +123,28 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 0 0 4px rgba(220, 38, 38, .12);
 }
 
+.sidebar-toggle {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--muted);
+}
+.sidebar-toggle::before {
+  content: "";
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: auto;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 5h16v2H4V5Zm0 6h16v2H4v-2Zm0 6h16v2H4v-2Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.sidebar-toggle:hover {
+  color: var(--ink);
+  border-color: #3a3f48;
+}
+
 .main {
   min-width: 0;
   padding: 30px;
@@ -895,12 +917,14 @@ body,
 
 .app-shell {
   grid-template-columns: 244px minmax(0, 1fr);
+  transition: grid-template-columns .18s ease;
 }
 
 .sidebar {
   background: #141519;
   border-right-color: var(--line);
   color: var(--ink);
+  overflow: hidden;
 }
 
 .brand-mark {
@@ -918,6 +942,38 @@ body,
 
 .nav a {
   color: #a8b0bb;
+}
+
+.sidebar-collapsed {
+  grid-template-columns: 68px minmax(0, 1fr);
+}
+.sidebar-collapsed .sidebar {
+  padding-inline: 10px;
+  align-items: center;
+}
+.sidebar-collapsed .brand {
+  justify-content: center;
+}
+.sidebar-collapsed .brand span:not(.brand-mark),
+.sidebar-collapsed .nav a {
+  font-size: 0;
+}
+.sidebar-collapsed .nav {
+  width: 100%;
+}
+.sidebar-collapsed .nav a {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+}
+.sidebar-collapsed .nav a::before {
+  margin: 0;
+}
+.sidebar-collapsed .connection-light {
+  margin-inline: auto;
+}
+.sidebar-collapsed .sidebar-toggle {
+  width: 42px;
 }
 
 .nav a.active,
@@ -1146,4 +1202,38 @@ tbody tr[data-view-row]:hover {
 
 .connection-light {
   border-color: #30343b;
+}
+
+@media (max-width: 960px) {
+  .app-shell,
+  .sidebar-collapsed {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+    height: auto;
+    align-items: stretch;
+  }
+  .sidebar-collapsed .sidebar {
+    align-items: stretch;
+    padding: 22px 14px;
+  }
+  .sidebar-collapsed .brand {
+    justify-content: flex-start;
+  }
+  .sidebar-collapsed .brand span:not(.brand-mark),
+  .sidebar-collapsed .nav a {
+    font-size: inherit;
+  }
+  .sidebar-collapsed .nav {
+    width: auto;
+  }
+  .sidebar-collapsed .nav a {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 9px 10px;
+  }
+  .sidebar-toggle {
+    width: 100%;
+  }
 }
