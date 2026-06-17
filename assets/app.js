@@ -578,6 +578,23 @@ function renderDetail(ticket) {
   const counts = getVoteCounts(ticket);
   const currentVote = (ticket.adminVotes || []).find(vote => vote.admin === getCurrentAdminName());
   byId("detailTitle").textContent = `${ticket.tkNumber} - ${ticket.reporter}`;
+  byId("detailHeadVote").innerHTML = `
+    <div class="head-vote-card">
+      <div class="head-vote-top">
+        <strong>สรุปผลโหวต</strong>
+        <button class="ghost-button" data-open-vote-log="${ticket.id}">ดูรายชื่อ</button>
+      </div>
+      <div class="head-vote-counts">
+        <span>ผิด <b>${counts.guilty}</b></span>
+        <span>ไม่ผิด <b>${counts.notGuilty}</b></span>
+      </div>
+      <div class="head-vote-actions">
+        <button class="danger-button" data-cast-vote="ผิด">โหวตว่าผิด</button>
+        <button class="primary-button" data-cast-vote="ไม่ผิด">โหวตว่าไม่ผิด</button>
+      </div>
+      <p>${currentVote ? `คุณโหวตแล้ว: ${escapeText(currentVote.vote)}` : "คุณยังไม่ได้โหวต"}</p>
+    </div>
+  `;
   byId("ticketDetailBody").innerHTML = `
     <div class="detail-grid">
       <div class="detail-item"><span>เลข TK</span><strong>${escapeText(ticket.tkNumber)}</strong></div>
@@ -613,22 +630,6 @@ function renderDetail(ticket) {
       </div>
     </section>
 
-    <section class="detail-panel detail-vote-panel">
-      <div class="section-title">
-        <h3>สรุปผลโหวต</h3>
-        <button class="ghost-button" data-open-vote-log="${ticket.id}">ดูรายชื่อผู้โหวต</button>
-      </div>
-      <div class="vote-summary">
-        <div><span>ผิด</span><strong>${counts.guilty}</strong></div>
-        <div><span>ไม่ผิด</span><strong>${counts.notGuilty}</strong></div>
-      </div>
-      <p class="muted">${currentVote ? `คุณโหวตแล้ว: ${escapeText(currentVote.vote)}` : "คุณยังไม่ได้โหวต Ticket นี้"}</p>
-      <div class="vote-actions">
-        <button class="danger-button" data-cast-vote="ผิด">โหวตว่าผิด</button>
-        <button class="primary-button" data-cast-vote="ไม่ผิด">โหวตว่าไม่ผิด</button>
-      </div>
-    </section>
-
     <section class="detail-panel detail-note-panel">
       <div class="section-title"><h3>หมายเหตุ</h3></div>
       <p>${escapeText(ticket.note || "ไม่มีหมายเหตุ")}</p>
@@ -637,13 +638,13 @@ function renderDetail(ticket) {
   byId("ticketDetailBody").querySelectorAll("[data-copy-detail]").forEach(button => {
     button.addEventListener("click", () => copyText(button.dataset.copyDetail));
   });
-  byId("ticketDetailBody").querySelectorAll("[data-cast-vote]").forEach(button => {
+  byId("detailHeadVote").querySelectorAll("[data-cast-vote]").forEach(button => {
     button.addEventListener("click", () => castAdminVote(ticket.id, button.dataset.castVote));
   });
   byId("ticketDetailBody").querySelectorAll("[data-zoom-image]").forEach(button => {
     button.addEventListener("click", () => openImageLightbox(button.dataset.zoomImage));
   });
-  byId("ticketDetailBody").querySelectorAll("[data-open-vote-log]").forEach(button => {
+  byId("detailHeadVote").querySelectorAll("[data-open-vote-log]").forEach(button => {
     button.addEventListener("click", () => openVoteDetail(button.dataset.openVoteLog));
   });
 }
@@ -720,6 +721,7 @@ function ensureDetailModal() {
           <p class="eyebrow">Ticket Detail</p>
           <h2 id="detailTitle">รายละเอียด Ticket</h2>
         </div>
+        <div class="detail-head-vote" id="detailHeadVote"></div>
         <button class="icon-button close" type="button" data-close-detail title="ปิด" aria-label="ปิด"></button>
       </header>
       <div id="ticketDetailBody" class="detail-body"></div>

@@ -397,6 +397,51 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   gap: 12px;
   margin-bottom: 24px;
 }
+.detail-head-vote {
+  flex: 1 1 420px;
+  max-width: 520px;
+}
+.head-vote-card {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-soft);
+}
+.head-vote-top,
+.head-vote-counts,
+.head-vote-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.head-vote-top {
+  justify-content: space-between;
+}
+.head-vote-top .ghost-button,
+.head-vote-actions button {
+  min-height: 32px;
+  padding: 0 10px;
+}
+.head-vote-counts span {
+  min-height: 28px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 13px;
+}
+.head-vote-counts b {
+  color: var(--ink);
+}
+.head-vote-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
 .form-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -759,6 +804,12 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   .detail-note-panel,
   .detail-media-panel,
   .detail-vote-panel { grid-column: 1 / -1; }
+  .modal-head { flex-wrap: wrap; }
+  .detail-head-vote {
+    flex-basis: 100%;
+    max-width: none;
+    order: 2;
+  }
   .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .form-grid > label,
   .form-grid > label.field-wide { grid-column: span 1; }
