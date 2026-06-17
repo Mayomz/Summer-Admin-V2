@@ -903,6 +903,7 @@ body,
   border-right-color: var(--line);
   color: var(--ink);
   overflow: hidden;
+  padding-top: 30px;
 }
 
 .brand-mark {
@@ -981,6 +982,8 @@ body,
 }
 
 .topbar {
+  align-items: flex-start;
+  min-height: 82px;
   padding-bottom: 18px;
   border-bottom: 1px solid var(--line);
 }
@@ -1207,6 +1210,7 @@ tbody tr[data-view-row]:hover {
     position: static;
     height: auto;
     align-items: stretch;
+    padding-top: 22px;
   }
   .sidebar-hover-expand .sidebar {
     align-items: stretch;
