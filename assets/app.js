@@ -142,7 +142,17 @@ function setupSidebarToggle() {
   const shell = document.querySelector(".app-shell");
   const sidebar = document.querySelector(".sidebar");
   if (!shell || !sidebar) return;
+  sidebar.querySelectorAll(".nav a").forEach(link => {
+    if (link.querySelector(".nav-label")) return;
+    const label = document.createElement("span");
+    label.className = "nav-label";
+    label.textContent = link.textContent.trim();
+    link.textContent = "";
+    link.append(label);
+  });
   shell.classList.add("sidebar-hover-expand");
+  sidebar.addEventListener("mouseenter", () => shell.classList.add("sidebar-expanded"));
+  sidebar.addEventListener("mouseleave", () => shell.classList.remove("sidebar-expanded"));
 }
 
 function getUserInitials(name = "") {
