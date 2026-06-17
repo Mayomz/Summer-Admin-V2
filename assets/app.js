@@ -577,7 +577,7 @@ function renderDetail(ticket) {
       <div class="detail-item"><span>ผลตัดสิน</span><strong>${escapeText(ticket.verdict)}</strong></div>
     </div>
 
-    <section class="subform">
+    <section class="detail-panel detail-links-panel">
       <div class="section-title">
         <h3>ลิงก์ห้อง Discord</h3>
       </div>
@@ -591,16 +591,16 @@ function renderDetail(ticket) {
       </div>
     </section>
 
-    <section class="subform">
+    <section class="detail-panel detail-media-panel">
       <div class="section-title">
         <h3>รูปหลักฐาน</h3>
       </div>
-      <div class="image-preview">
-        ${(ticket.imageLinks || []).map(url => `<img src="${escapeText(url)}" alt="หลักฐาน" loading="lazy">`).join("") || "<p>ยังไม่มีรูปหลักฐาน</p>"}
+      <div class="detail-image-grid">
+        ${(ticket.imageLinks || []).map(url => `<button class="evidence-thumb" data-zoom-image="${escapeText(url)}"><img src="${escapeText(url)}" alt="หลักฐาน" loading="lazy"></button>`).join("") || "<p>ยังไม่มีรูปหลักฐาน</p>"}
       </div>
     </section>
 
-    <section class="subform">
+    <section class="detail-panel detail-vote-panel">
       <div class="section-title">
         <h3>โหวตของแอดมิน</h3>
         <span class="badge wait">ผิด ${counts.guilty} / ไม่ผิด ${counts.notGuilty}</span>
@@ -620,7 +620,7 @@ function renderDetail(ticket) {
       </div>
     </section>
 
-    <section class="subform">
+    <section class="detail-panel detail-note-panel">
       <div class="section-title"><h3>หมายเหตุ</h3></div>
       <p>${escapeText(ticket.note || "ไม่มีหมายเหตุ")}</p>
     </section>
@@ -630,6 +630,31 @@ function renderDetail(ticket) {
   });
   byId("ticketDetailBody").querySelectorAll("[data-cast-vote]").forEach(button => {
     button.addEventListener("click", () => castAdminVote(ticket.id, button.dataset.castVote));
+  });
+  byId("ticketDetailBody").querySelectorAll("[data-zoom-image]").forEach(button => {
+    button.addEventListener("click", () => openImageLightbox(button.dataset.zoomImage));
+  });
+}
+
+function openImageLightbox(url) {
+  ensureImageLightbox();
+  byId("lightboxImage").src = url;
+  byId("imageLightbox").showModal();
+}
+
+function ensureImageLightbox() {
+  if (byId("imageLightbox")) return;
+  const modal = document.createElement("dialog");
+  modal.className = "image-lightbox";
+  modal.id = "imageLightbox";
+  modal.innerHTML = `
+    <button class="icon-button close" type="button" data-close-image title="ปิด" aria-label="ปิด"></button>
+    <img id="lightboxImage" alt="หลักฐาน">
+  `;
+  document.body.appendChild(modal);
+  modal.querySelector("[data-close-image]").addEventListener("click", () => modal.close());
+  modal.addEventListener("click", event => {
+    if (event.target === modal) modal.close();
   });
 }
 
@@ -759,6 +784,9 @@ function initTickets() {
   }));
   document.querySelectorAll("[data-close-detail]").forEach(button => button.addEventListener("click", () => {
     byId("ticketDetailModal").close();
+  }));
+  document.querySelectorAll("[data-close-image]").forEach(button => button.addEventListener("click", () => {
+    byId("imageLightbox").close();
   }));
   document.querySelector("[data-action='seed']").addEventListener("click", () => {
     seedData();
