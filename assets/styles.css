@@ -554,7 +554,7 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
 }
 .detail-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  grid-template-columns: 1fr;
   gap: 14px;
 }
 .detail-grid {
@@ -586,12 +586,10 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   background: var(--panel-soft);
 }
 .detail-links-panel,
-.detail-note-panel {
-  grid-column: 1 / 2;
-}
+.detail-note-panel,
 .detail-media-panel,
 .detail-vote-panel {
-  grid-column: 2 / 3;
+  grid-column: 1 / -1;
 }
 .detail-links {
   display: grid;
@@ -678,7 +676,7 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
 }
 .detail-image-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
 }
 .evidence-thumb {
