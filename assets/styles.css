@@ -1067,26 +1067,25 @@ strong {
   grid-template-columns: 52px minmax(0, 1fr);
 }
 .sidebar-hover-expand .sidebar {
+  display: grid;
+  grid-template-rows: 52px auto 1fr 48px;
   padding-inline: 8px;
-  padding-top: 16px;
+  padding-block: 8px 14px;
   align-items: center;
-  gap: 16px;
+  justify-items: center;
+  gap: 0;
   position: sticky;
 }
 .sidebar-hover-expand .sidebar::before {
   content: "";
   position: absolute;
-  top: 58px;
+  top: 60px;
   left: 0;
   right: 0;
   height: 1px;
   background: var(--line);
 }
 .sidebar-hover-expand .brand {
-  position: absolute;
-  top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
   width: 36px;
   min-height: 36px;
   justify-content: center;
@@ -1104,12 +1103,9 @@ strong {
   transform: translateX(-8px);
 }
 .sidebar-hover-expand .nav {
-  position: absolute;
-  top: 74px;
-  left: 50%;
-  transform: translateX(-50%);
+  align-self: start;
   width: 36px;
-  padding-top: 0;
+  padding-top: 14px;
 }
 .sidebar-hover-expand .nav a {
   width: 36px;
@@ -1128,10 +1124,7 @@ strong {
   margin-inline: auto;
 }
 .sidebar-hover-expand .sidebar-user {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
+  align-self: end;
   width: 36px;
   min-height: 36px;
   justify-content: center;
@@ -1148,17 +1141,17 @@ strong {
   grid-template-columns: 244px minmax(0, 1fr);
 }
 .sidebar-hover-expand.sidebar-expanded .sidebar {
+  display: flex;
   padding-top: 30px;
   padding-inline: 14px;
   align-items: stretch;
+  justify-items: stretch;
   gap: 24px;
 }
 .sidebar-hover-expand.sidebar-expanded .sidebar::before {
   display: none;
 }
 .sidebar-hover-expand.sidebar-expanded .brand {
-  position: static;
-  transform: none;
   width: auto;
   min-height: auto;
   justify-content: flex-start;
@@ -1176,8 +1169,7 @@ strong {
   transform: translateX(0);
 }
 .sidebar-hover-expand.sidebar-expanded .nav {
-  position: static;
-  transform: none;
+  align-self: auto;
   width: 100%;
   padding-top: 48px;
 }
@@ -1189,8 +1181,7 @@ strong {
   padding: 9px 10px;
 }
 .sidebar-hover-expand.sidebar-expanded .sidebar-user {
-  position: static;
-  transform: none;
+  align-self: auto;
   width: auto;
   min-height: 48px;
   justify-content: flex-start;
@@ -1480,16 +1471,16 @@ tbody tr[data-view-row]:hover {
     padding-top: 22px;
   }
   .sidebar-hover-expand .sidebar {
+    display: flex;
     position: static;
     align-items: stretch;
     padding: 22px 14px;
+    gap: 24px;
   }
   .sidebar-hover-expand .sidebar::before {
     display: none;
   }
   .sidebar-hover-expand .brand {
-    position: static;
-    transform: none;
     width: auto;
     min-height: auto;
     justify-content: flex-start;
@@ -1507,9 +1498,9 @@ tbody tr[data-view-row]:hover {
     transform: translateX(0);
   }
   .sidebar-hover-expand .nav {
-    position: static;
-    transform: none;
+    align-self: auto;
     width: auto;
+    padding-top: 0;
   }
   .sidebar-hover-expand .nav a {
     width: auto;
@@ -1523,8 +1514,7 @@ tbody tr[data-view-row]:hover {
     height: 20px;
   }
   .sidebar-hover-expand .sidebar-user {
-    position: static;
-    transform: none;
+    align-self: auto;
     width: auto;
     min-height: 48px;
     justify-content: flex-start;
