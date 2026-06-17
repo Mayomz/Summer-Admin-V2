@@ -145,6 +145,46 @@ function setupSidebarToggle() {
   shell.classList.add("sidebar-hover-expand");
 }
 
+function getUserInitials(name = "") {
+  return String(name || "A")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part[0])
+    .join("")
+    .toUpperCase() || "A";
+}
+
+function setupCurrentUserUI() {
+  if (!state.session) return;
+  const name = state.session.userId || state.session.name || "Admin";
+  const role = normalizeRole(state.session.role);
+  const initials = getUserInitials(name);
+  const avatar = `<span class="user-avatar" aria-hidden="true">${escapeText(initials)}</span>`;
+
+  const sidebar = document.querySelector(".sidebar");
+  if (sidebar && !sidebar.querySelector(".sidebar-user")) {
+    sidebar.insertAdjacentHTML("beforeend", `
+      <div class="sidebar-user" title="${escapeText(name)} - ${escapeText(role)}">
+        ${avatar}
+        <span class="sidebar-user-meta">
+          <strong>${escapeText(name)}</strong>
+          <small>${escapeText(role)}</small>
+        </span>
+      </div>
+    `);
+  }
+
+  const actions = document.querySelector(".top-actions");
+  if (actions && !actions.querySelector(".top-user-avatar")) {
+    actions.insertAdjacentHTML("afterbegin", `
+      <span class="top-user-avatar" title="${escapeText(name)} - ${escapeText(role)}">
+        ${avatar}
+      </span>
+    `);
+  }
+}
+
 function updateConnectionLight(status = null) {
   const light = byId("connectionLight");
   if (!light) return;
@@ -1094,6 +1134,7 @@ async function boot() {
     if (!requireSession()) return;
     setupNavigation();
     setupSidebarToggle();
+    setupCurrentUserUI();
     updateConnectionLight();
     initLogout();
   }
