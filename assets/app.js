@@ -233,6 +233,19 @@ function nowLocalInput() {
   return now.toISOString().slice(0, 16);
 }
 
+function formatDateTime(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value).replace("T", " ");
+  return date.toLocaleString("th-TH", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 function priorityClass(value) {
   if (value === "สูง") return "high";
   if (value === "กลาง") return "mid";
@@ -602,21 +615,17 @@ function renderDetail(ticket) {
 
     <section class="detail-panel detail-vote-panel">
       <div class="section-title">
-        <h3>โหวตของแอดมิน</h3>
-        <span class="badge wait">ผิด ${counts.guilty} / ไม่ผิด ${counts.notGuilty}</span>
+        <h3>สรุปผลโหวต</h3>
+        <button class="ghost-button" data-open-vote-log="${ticket.id}">ดูรายชื่อผู้โหวต</button>
       </div>
+      <div class="vote-summary">
+        <div><span>ผิด</span><strong>${counts.guilty}</strong></div>
+        <div><span>ไม่ผิด</span><strong>${counts.notGuilty}</strong></div>
+      </div>
+      <p class="muted">${currentVote ? `คุณโหวตแล้ว: ${escapeText(currentVote.vote)}` : "คุณยังไม่ได้โหวต Ticket นี้"}</p>
       <div class="vote-actions">
         <button class="danger-button" data-cast-vote="ผิด">โหวตว่าผิด</button>
         <button class="primary-button" data-cast-vote="ไม่ผิด">โหวตว่าไม่ผิด</button>
-      </div>
-      <p class="muted">${currentVote ? `คุณโหวตแล้ว: ${escapeText(currentVote.vote)}` : "คุณยังไม่ได้โหวต Ticket นี้"}</p>
-      <div class="vote-list">
-        ${(ticket.adminVotes || []).map(vote => `
-          <div class="vote-item">
-            <strong>${escapeText(vote.admin)}</strong>
-            <span class="badge ${verdictClass(vote.vote)}">${escapeText(vote.vote)}</span>
-          </div>
-        `).join("") || "<p>ยังไม่มีแอดมินโหวต</p>"}
       </div>
     </section>
 
@@ -634,6 +643,47 @@ function renderDetail(ticket) {
   byId("ticketDetailBody").querySelectorAll("[data-zoom-image]").forEach(button => {
     button.addEventListener("click", () => openImageLightbox(button.dataset.zoomImage));
   });
+  byId("ticketDetailBody").querySelectorAll("[data-open-vote-log]").forEach(button => {
+    button.addEventListener("click", () => openVoteDetail(button.dataset.openVoteLog));
+  });
+}
+
+function openVoteDetail(id) {
+  ensureVoteDetailModal();
+  const ticket = state.tickets.find(item => item.id === id) || state.archive.find(item => item.id === id);
+  if (!ticket) return;
+  byId("voteDetailTitle").textContent = `รายชื่อผู้โหวต ${ticket.tkNumber}`;
+  byId("voteDetailBody").innerHTML = (ticket.adminVotes || []).map(vote => `
+    <div class="vote-log-item">
+      <div>
+        <strong>${escapeText(vote.admin)}</strong>
+        <span>${escapeText(formatDateTime(vote.votedAt))}</span>
+      </div>
+      <span class="badge ${verdictClass(vote.vote)}">${escapeText(vote.vote)}</span>
+    </div>
+  `).join("") || `<p>ยังไม่มีแอดมินโหวต</p>`;
+  byId("voteDetailModal").showModal();
+}
+
+function ensureVoteDetailModal() {
+  if (byId("voteDetailModal")) return;
+  const modal = document.createElement("dialog");
+  modal.className = "modal compact-modal";
+  modal.id = "voteDetailModal";
+  modal.innerHTML = `
+    <section class="modal-card">
+      <header class="modal-head">
+        <div>
+          <p class="eyebrow">Vote Log</p>
+          <h2 id="voteDetailTitle">รายชื่อผู้โหวต</h2>
+        </div>
+        <button class="icon-button close" type="button" data-close-vote-detail title="ปิด" aria-label="ปิด"></button>
+      </header>
+      <div id="voteDetailBody" class="vote-log-list"></div>
+    </section>
+  `;
+  document.body.appendChild(modal);
+  modal.querySelector("[data-close-vote-detail]").addEventListener("click", () => modal.close());
 }
 
 function openImageLightbox(url) {
@@ -787,6 +837,9 @@ function initTickets() {
   }));
   document.querySelectorAll("[data-close-image]").forEach(button => button.addEventListener("click", () => {
     byId("imageLightbox").close();
+  }));
+  document.querySelectorAll("[data-close-vote-detail]").forEach(button => button.addEventListener("click", () => {
+    byId("voteDetailModal").close();
   }));
   document.querySelector("[data-action='seed']").addEventListener("click", () => {
     seedData();

@@ -192,6 +192,19 @@
     <img id="lightboxImage" alt="หลักฐาน">
   </dialog>
 
+  <dialog class="modal compact-modal" id="voteDetailModal">
+    <section class="modal-card">
+      <header class="modal-head">
+        <div>
+          <p class="eyebrow">Vote Log</p>
+          <h2 id="voteDetailTitle">รายชื่อผู้โหวต</h2>
+        </div>
+        <button class="icon-button close" type="button" data-close-vote-detail title="ปิด" aria-label="ปิด"></button>
+      </header>
+      <div id="voteDetailBody" class="vote-log-list"></div>
+    </section>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/site-config.js"></script>
   <script src="assets/app.js"></script>
