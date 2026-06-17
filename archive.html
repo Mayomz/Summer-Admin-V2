@@ -24,7 +24,12 @@
     <main class="main">
       <header class="topbar">
         <div><p class="eyebrow">Archive</p><h1>คลังเก็บข้อมูลงาน</h1></div>
-        <div class="top-actions"><button class="ghost-button" data-logout>ออกจากระบบ</button><button class="danger-button" id="clearArchive">ลบคลังทั้งหมด</button></div>
+        <div class="top-actions">
+          <button class="ghost-button" id="copyArchiveSheet">คัดลอกไปวางใน Sheet</button>
+          <button class="ghost-button" id="exportArchiveCsv">ส่งออก CSV</button>
+          <button class="ghost-button" data-logout>ออกจากระบบ</button>
+          <button class="danger-button" id="clearArchive">ลบคลังทั้งหมด</button>
+        </div>
       </header>
       <section class="workspace">
         <div class="toolbar">

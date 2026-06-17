@@ -281,6 +281,47 @@ function copyText(text) {
   navigator.clipboard.writeText(text).then(() => alert("คัดลอกลิงก์แล้ว"));
 }
 
+function archiveSheetRows() {
+  const headers = ["เลข TK", "ผู้แจ้ง", "เวลาบันทึก", "หมวดหมู่", "ความสำคัญ", "กำหนดส่ง", "สถานะ", "ผลตัดสิน", "ลิงก์ Discord", "ลิงก์รูป", "โหวตผิด", "โหวตไม่ผิด", "ผู้โหวต", "หมายเหตุ", "เวลาเข้าคลัง"];
+  const rows = state.archive.map(ticket => {
+    const counts = getVoteCounts(ticket);
+    return [
+      ticket.tkNumber,
+      ticket.reporter,
+      ticket.createdAt,
+      ticket.category,
+      ticket.priority,
+      ticket.dueDate,
+      ticket.status,
+      ticket.verdict,
+      (ticket.discordLinks || []).join(" | "),
+      (ticket.imageLinks || []).join(" | "),
+      counts.guilty,
+      counts.notGuilty,
+      (ticket.adminVotes || []).map(vote => `${vote.admin}:${vote.vote}`).join(" | "),
+      ticket.note || "",
+      ticket.archivedAt || ""
+    ];
+  });
+  return [headers, ...rows];
+}
+
+function toCsvValue(value) {
+  return `"${String(value ?? "").replaceAll('"', '""')}"`;
+}
+
+function downloadTextFile(filename, text, type = "text/plain;charset=utf-8") {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function seedData() {
   if (state.tickets.length) return;
   state.tickets = [
@@ -728,6 +769,14 @@ function initTickets() {
 
 function initArchive() {
   const input = byId("archiveSearch");
+  const exportCsv = () => {
+    const csv = archiveSheetRows().map(row => row.map(toCsvValue).join(",")).join("\n");
+    downloadTextFile(`fivem-ticket-archive-${todayIso()}.csv`, `\ufeff${csv}`, "text/csv;charset=utf-8");
+  };
+  const copySheet = () => {
+    const tsv = archiveSheetRows().map(row => row.map(value => String(value ?? "").replaceAll("\t", " ").replaceAll("\n", " ")).join("\t")).join("\n");
+    navigator.clipboard.writeText(tsv).then(() => alert("คัดลอกข้อมูลแล้ว นำไปวางใน Google Sheets ได้เลย"));
+  };
   const render = () => {
     const search = input.value.toLowerCase();
     byId("archiveRows").innerHTML = state.archive.filter(ticket => {
@@ -761,6 +810,8 @@ function initArchive() {
     }));
   };
   input.addEventListener("input", render);
+  byId("exportArchiveCsv").addEventListener("click", exportCsv);
+  byId("copyArchiveSheet").addEventListener("click", copySheet);
   byId("clearArchive").addEventListener("click", () => {
     if (!confirm("ลบคลังทั้งหมดใช่ไหม")) return;
     state.archive = [];
