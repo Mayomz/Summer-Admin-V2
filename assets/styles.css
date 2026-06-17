@@ -1070,6 +1070,16 @@ strong {
   padding-inline: 8px;
   padding-top: 16px;
   align-items: center;
+  gap: 16px;
+}
+.sidebar-hover-expand .sidebar::before {
+  content: "";
+  position: absolute;
+  top: 52px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line);
 }
 .sidebar-hover-expand .brand {
   width: 36px;
@@ -1090,7 +1100,7 @@ strong {
 }
 .sidebar-hover-expand .nav {
   width: 36px;
-  padding-top: 20px;
+  padding-top: 0;
 }
 .sidebar-hover-expand .nav a {
   width: 36px;
@@ -1128,6 +1138,10 @@ strong {
   padding-top: 30px;
   padding-inline: 14px;
   align-items: stretch;
+  gap: 24px;
+}
+.sidebar-hover-expand.sidebar-expanded .sidebar::before {
+  display: none;
 }
 .sidebar-hover-expand.sidebar-expanded .brand {
   width: auto;
@@ -1193,7 +1207,7 @@ strong {
 .topbar::after {
   content: "";
   position: absolute;
-  left: calc(-1 * (100vw - 100% - 30px));
+  left: 0;
   right: -30px;
   bottom: 0;
   height: 1px;
@@ -1416,6 +1430,12 @@ tbody tr[data-view-row]:hover {
 .sidebar-user {
   background: #101216;
   border-color: #2a2d34;
+}
+
+.sidebar-hover-expand:not(.sidebar-expanded) .sidebar-user {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .sidebar-user-meta strong {
