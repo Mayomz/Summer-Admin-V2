@@ -187,11 +187,17 @@ function setupCurrentUserUI() {
 
 function updateConnectionLight(status = null) {
   const light = byId("connectionLight");
-  if (!light) return;
   const online = status ?? isSupabaseReady();
-  light.classList.toggle("online", Boolean(online));
-  light.classList.toggle("offline", !online);
-  light.title = online ? "เชื่อมต่อฐานข้อมูลแล้ว" : "ยังไม่เชื่อมต่อฐานข้อมูล";
+  if (light) {
+    light.classList.toggle("online", Boolean(online));
+    light.classList.toggle("offline", !online);
+    light.title = online ? "เชื่อมต่อฐานข้อมูลแล้ว" : "ยังไม่เชื่อมต่อฐานข้อมูล";
+  }
+  document.querySelectorAll(".user-avatar").forEach(avatar => {
+    avatar.classList.toggle("online", Boolean(online));
+    avatar.classList.toggle("offline", !online);
+    avatar.title = online ? "ออนไลน์" : "ออฟไลน์";
+  });
 }
 
 function isSupabaseReady() {
