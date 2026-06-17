@@ -156,9 +156,63 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 0 0 4px rgba(248, 113, 113, .16);
 }
 
-.top-user-avatar {
+.top-user-menu {
+  position: relative;
   display: inline-flex;
   align-items: center;
+}
+
+.top-user-avatar {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.top-user-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  width: 190px;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+.top-user-menu:focus-within .top-user-panel,
+.top-user-menu:hover .top-user-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.top-user-panel strong,
+.top-user-panel small {
+  display: block;
+}
+
+.top-user-panel small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.top-user-panel .ghost-button {
+  width: 100%;
+  justify-content: center;
 }
 
 .sidebar-user {

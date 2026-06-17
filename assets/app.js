@@ -172,6 +172,10 @@ function setupCurrentUserUI() {
   const initials = getUserInitials(name);
   const avatar = `<span class="user-avatar" aria-hidden="true">${escapeText(initials)}</span>`;
 
+  document.querySelectorAll("[data-logout]").forEach(button => {
+    if (!button.closest(".top-user-menu")) button.remove();
+  });
+
   const sidebar = document.querySelector(".sidebar");
   if (sidebar && !sidebar.querySelector(".sidebar-user")) {
     sidebar.insertAdjacentHTML("beforeend", `
@@ -185,12 +189,27 @@ function setupCurrentUserUI() {
     `);
   }
 
-  const actions = document.querySelector(".top-actions");
-  if (actions && !actions.querySelector(".top-user-avatar")) {
+  const topbar = document.querySelector(".topbar");
+  let actions = document.querySelector(".top-actions");
+  if (!actions && topbar) {
+    actions = document.createElement("div");
+    actions.className = "top-actions";
+    topbar.append(actions);
+  }
+  if (actions && !actions.querySelector(".top-user-menu")) {
     actions.insertAdjacentHTML("afterbegin", `
-      <span class="top-user-avatar" title="${escapeText(name)} - ${escapeText(role)}">
-        ${avatar}
-      </span>
+      <div class="top-user-menu">
+        <button type="button" class="top-user-avatar" title="${escapeText(name)} - ${escapeText(role)}" aria-label="เมนูผู้ใช้">
+          ${avatar}
+        </button>
+        <div class="top-user-panel">
+          <div>
+            <strong>${escapeText(name)}</strong>
+            <small>${escapeText(role)}</small>
+          </div>
+          <button type="button" class="ghost-button" data-logout>ออกจากระบบ</button>
+        </div>
+      </div>
     `);
   }
 }
