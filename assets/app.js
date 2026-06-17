@@ -463,7 +463,7 @@ function renderTickets() {
   rows.innerHTML = filtered.map(ticket => {
     const counts = getVoteCounts(ticket);
     return `
-    <tr>
+    <tr data-view-row="${ticket.id}">
       <td><strong>${escapeText(ticket.tkNumber)}</strong></td>
       <td>${escapeText(ticket.reporter)}</td>
       <td>${escapeText(ticket.createdAt.replace("T", " "))}</td>
@@ -474,7 +474,6 @@ function renderTickets() {
       <td><span class="badge ${verdictClass(ticket.verdict)}">${escapeText(ticket.verdict)}</span> ${counts.guilty}/${counts.notGuilty}</td>
       <td>
         <div class="row-actions">
-          <button data-view="${ticket.id}">ดู</button>
           <button data-edit="${ticket.id}">แก้ไข</button>
           <button data-archive="${ticket.id}">เก็บ</button>
         </div>
@@ -482,7 +481,8 @@ function renderTickets() {
     </tr>
   `;
   }).join("");
-  rows.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => openDetail(button.dataset.view)));
+  rows.querySelectorAll("[data-view-row]").forEach(row => row.addEventListener("click", () => openDetail(row.dataset.viewRow)));
+  rows.querySelectorAll(".row-actions button").forEach(button => button.addEventListener("click", event => event.stopPropagation()));
   rows.querySelectorAll("[data-edit]").forEach(button => button.addEventListener("click", () => openEdit(button.dataset.edit)));
   rows.querySelectorAll("[data-archive]").forEach(button => button.addEventListener("click", () => archiveTicket(button.dataset.archive)));
   renderTicketMetrics();
