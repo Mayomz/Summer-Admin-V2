@@ -17,6 +17,7 @@
         </span>
       </a>
       <nav class="nav">
+        <a href="dashboard.html" data-icon="dashboard">Dashboard</a>
         <a class="active" href="index.html" data-icon="ticket">จัดการ Ticket</a>
         <a href="admin.html" data-icon="shield">สิทธิ์ผู้ใช้</a>
         <a href="archive.html" data-icon="archive">คลังงาน</a>
@@ -24,10 +25,7 @@
         <a href="config.html" data-icon="database">ฐานข้อมูล</a>
         <a href="stats.html" data-icon="chart">สถิติ</a>
       </nav>
-      <div class="side-note">
-        <span>โหมดบันทึก</span>
-        <strong id="storageMode">Local Browser</strong>
-      </div>
+      <div class="connection-light" id="connectionLight" title="สถานะการเชื่อมต่อ"></div>
     </aside>
 
     <main class="main">
@@ -42,25 +40,6 @@
           <button class="primary-button" data-open-modal="ticketModal">เพิ่ม Ticket</button>
         </div>
       </header>
-
-      <section class="metric-grid" aria-label="ภาพรวม Ticket">
-        <article class="metric">
-          <span>งานเปิดอยู่</span>
-          <strong id="openCount">0</strong>
-        </article>
-        <article class="metric">
-          <span>เร่งด่วน</span>
-          <strong id="urgentCount">0</strong>
-        </article>
-        <article class="metric">
-          <span>ครบกำหนดวันนี้</span>
-          <strong id="dueTodayCount">0</strong>
-        </article>
-        <article class="metric">
-          <span>รอตัดสิน</span>
-          <strong id="votePendingCount">0</strong>
-        </article>
-      </section>
 
       <section class="workspace">
         <div class="toolbar">

@@ -5,6 +5,7 @@
 ## ไฟล์สำคัญ
 
 - `login.html` หน้าเข้าสู่ระบบ
+- `dashboard.html` หน้าแดชบอร์ดภาพรวม
 - `index.html` หน้าจัดการ Ticket
 - `admin.html` หน้าจัดการสิทธิ์ผู้ใช้
 - `archive.html` หน้าคลังงาน

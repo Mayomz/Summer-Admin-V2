@@ -52,12 +52,13 @@ let state = loadState();
 const page = document.body.dataset.page;
 
 const rolePages = {
-  SuperAdmin: ["tickets", "admin", "archive", "backend", "config", "stats"],
-  Admin: ["tickets", "archive", "stats"],
+  SuperAdmin: ["dashboard", "tickets", "admin", "archive", "backend", "config", "stats"],
+  Admin: ["dashboard", "tickets", "archive", "stats"],
   Guest: []
 };
 
 const pageLabels = {
+  dashboard: "Dashboard",
   tickets: "Ticket",
   admin: "Admin",
   archive: "Archive",
@@ -106,7 +107,8 @@ function syncSessionRole() {
 function setupNavigation() {
   document.querySelectorAll(".nav a").forEach(link => {
     const href = link.getAttribute("href") || "";
-    const targetPage = href.includes("admin") ? "admin"
+    const targetPage = href.includes("dashboard") ? "dashboard"
+      : href.includes("admin") ? "admin"
       : href.includes("archive") ? "archive"
       : href.includes("backend") ? "backend"
       : href.includes("config") ? "config"
@@ -116,6 +118,15 @@ function setupNavigation() {
       link.style.display = "none";
     }
   });
+}
+
+function updateConnectionLight(status = null) {
+  const light = byId("connectionLight");
+  if (!light) return;
+  const online = status ?? isSupabaseReady();
+  light.classList.toggle("online", Boolean(online));
+  light.classList.toggle("offline", !online);
+  light.title = online ? "เชื่อมต่อฐานข้อมูลแล้ว" : "ยังไม่เชื่อมต่อฐานข้อมูล";
 }
 
 function isSupabaseReady() {
@@ -145,8 +156,10 @@ async function pullRemoteState() {
   const { data, error } = await client.from(table).select("value").eq("key", key).maybeSingle();
   if (error) {
     console.warn("Supabase read failed", error);
+    updateConnectionLight(false);
     return;
   }
+  updateConnectionLight(true);
   if (data?.value) {
     const localSession = state.session;
     state = {
@@ -290,8 +303,7 @@ function seedData() {
 }
 
 function setStorageMode() {
-  const target = byId("storageMode");
-  if (target) target.textContent = state.config.provider === "local" ? "Local Browser" : state.config.provider;
+  updateConnectionLight();
 }
 
 function initLogin() {
@@ -620,10 +632,26 @@ function renderTicketMetrics() {
   const urgent = state.tickets.filter(ticket => ticket.priority === "สูง").length;
   const dueToday = state.tickets.filter(ticket => ticket.dueDate === todayIso()).length;
   const pending = state.tickets.filter(ticket => ticket.verdict === "รอโหวต").length;
-  byId("openCount").textContent = open;
-  byId("urgentCount").textContent = urgent;
-  byId("dueTodayCount").textContent = dueToday;
-  byId("votePendingCount").textContent = pending;
+  if (byId("openCount")) byId("openCount").textContent = open;
+  if (byId("urgentCount")) byId("urgentCount").textContent = urgent;
+  if (byId("dueTodayCount")) byId("dueTodayCount").textContent = dueToday;
+  if (byId("votePendingCount")) byId("votePendingCount").textContent = pending;
+}
+
+function initDashboard() {
+  renderTicketMetrics();
+  const rows = byId("dashboardRows");
+  if (!rows) return;
+  rows.innerHTML = state.tickets.slice(0, 8).map(ticket => `
+    <tr>
+      <td><strong>${escapeText(ticket.tkNumber)}</strong></td>
+      <td>${escapeText(ticket.reporter)}</td>
+      <td>${escapeText(ticket.category)}</td>
+      <td><span class="badge ${priorityClass(ticket.priority)}">${escapeText(ticket.priority)}</span></td>
+      <td>${escapeText(ticket.status)}</td>
+      <td>${escapeText(ticket.dueDate)}</td>
+    </tr>
+  `).join("") || `<tr><td colspan="6">ยังไม่มี Ticket</td></tr>`;
 }
 
 function openEdit(id) {
@@ -877,6 +905,7 @@ function initStats() {
 const initializers = {
   login: initLogin,
   register: initRegister,
+  dashboard: initDashboard,
   tickets: initTickets,
   archive: initArchive,
   admin: initAdmin,
@@ -892,6 +921,7 @@ async function boot() {
   if (page !== "login") {
     if (!requireSession()) return;
     setupNavigation();
+    updateConnectionLight();
     initLogout();
   }
   initializers[page]?.();
