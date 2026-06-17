@@ -141,6 +141,24 @@ function verdictClass(value) {
   return "wait";
 }
 
+function getVoteCounts(ticket) {
+  const adminVotes = ticket.adminVotes || [];
+  if (adminVotes.length) {
+    return {
+      guilty: adminVotes.filter(vote => vote.vote === "ผิด").length,
+      notGuilty: adminVotes.filter(vote => vote.vote === "ไม่ผิด").length
+    };
+  }
+  return {
+    guilty: Number(ticket.votes?.guilty || 0),
+    notGuilty: Number(ticket.votes?.notGuilty || 0)
+  };
+}
+
+function getCurrentAdminName() {
+  return state.session?.name || "Unknown Admin";
+}
+
 function escapeText(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -169,6 +187,7 @@ function seedData() {
       discordLinks: ["https://discord.com/channels/server/ticket-1001"],
       imageLinks: ["https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80"],
       votes: { guilty: 3, notGuilty: 1 },
+      adminVotes: [],
       note: "เคสทะเลาะวิวาทในเมือง"
     },
     {
@@ -184,6 +203,7 @@ function seedData() {
       discordLinks: ["https://discord.com/channels/server/ticket-1002"],
       imageLinks: [],
       votes: { guilty: 0, notGuilty: 2 },
+      adminVotes: [],
       note: ""
     }
   ];
@@ -273,6 +293,7 @@ function resetTicketForm(ticket = null) {
 }
 
 function ticketFromForm() {
+  const oldTicket = state.tickets.find(item => item.id === byId("ticketId").value);
   return {
     id: byId("ticketId").value || crypto.randomUUID(),
     tkNumber: byId("tkNumber").value.trim(),
@@ -289,6 +310,7 @@ function ticketFromForm() {
       guilty: Number(byId("voteGuilty").value || 0),
       notGuilty: Number(byId("voteNotGuilty").value || 0)
     },
+    adminVotes: oldTicket?.adminVotes || [],
     note: byId("note").value.trim()
   };
 }
@@ -303,7 +325,9 @@ function renderTickets() {
     const hay = `${ticket.tkNumber} ${ticket.reporter} ${ticket.category}`.toLowerCase();
     return hay.includes(search) && (!priority || ticket.priority === priority) && (!status || ticket.status === status);
   });
-  rows.innerHTML = filtered.map(ticket => `
+  rows.innerHTML = filtered.map(ticket => {
+    const counts = getVoteCounts(ticket);
+    return `
     <tr>
       <td><strong>${escapeText(ticket.tkNumber)}</strong></td>
       <td>${escapeText(ticket.reporter)}</td>
@@ -312,18 +336,148 @@ function renderTickets() {
       <td><span class="badge ${priorityClass(ticket.priority)}">${escapeText(ticket.priority)}</span></td>
       <td>${escapeText(ticket.dueDate)}</td>
       <td>${escapeText(ticket.status)}</td>
-      <td><span class="badge ${verdictClass(ticket.verdict)}">${escapeText(ticket.verdict)}</span></td>
+      <td><span class="badge ${verdictClass(ticket.verdict)}">${escapeText(ticket.verdict)}</span> ${counts.guilty}/${counts.notGuilty}</td>
       <td>
         <div class="row-actions">
+          <button data-view="${ticket.id}">ดู</button>
           <button data-edit="${ticket.id}">แก้ไข</button>
           <button data-archive="${ticket.id}">เก็บ</button>
         </div>
       </td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
+  rows.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => openDetail(button.dataset.view)));
   rows.querySelectorAll("[data-edit]").forEach(button => button.addEventListener("click", () => openEdit(button.dataset.edit)));
   rows.querySelectorAll("[data-archive]").forEach(button => button.addEventListener("click", () => archiveTicket(button.dataset.archive)));
   renderTicketMetrics();
+}
+
+function renderDetail(ticket) {
+  ensureDetailModal();
+  const counts = getVoteCounts(ticket);
+  const currentVote = (ticket.adminVotes || []).find(vote => vote.admin === getCurrentAdminName());
+  byId("detailTitle").textContent = `${ticket.tkNumber} - ${ticket.reporter}`;
+  byId("ticketDetailBody").innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item"><span>เลข TK</span><strong>${escapeText(ticket.tkNumber)}</strong></div>
+      <div class="detail-item"><span>ผู้แจ้ง</span><strong>${escapeText(ticket.reporter)}</strong></div>
+      <div class="detail-item"><span>เวลาบันทึก</span><strong>${escapeText(ticket.createdAt.replace("T", " "))}</strong></div>
+      <div class="detail-item"><span>หมวดหมู่</span><strong>${escapeText(ticket.category)}</strong></div>
+      <div class="detail-item"><span>ความสำคัญ</span><strong>${escapeText(ticket.priority)}</strong></div>
+      <div class="detail-item"><span>กำหนดส่ง</span><strong>${escapeText(ticket.dueDate)}</strong></div>
+      <div class="detail-item"><span>สถานะ</span><strong>${escapeText(ticket.status)}</strong></div>
+      <div class="detail-item"><span>ผลตัดสิน</span><strong>${escapeText(ticket.verdict)}</strong></div>
+    </div>
+
+    <section class="subform">
+      <div class="section-title">
+        <h3>ลิงก์ห้อง Discord</h3>
+      </div>
+      <div class="detail-links">
+        ${(ticket.discordLinks || []).map(link => `
+          <div class="link-row">
+            <a href="${escapeText(link)}" target="_blank" rel="noreferrer">${escapeText(link)}</a>
+            <button class="ghost-button" data-copy-detail="${escapeText(link)}">Copy</button>
+          </div>
+        `).join("") || "<p>ยังไม่มีลิงก์ Discord</p>"}
+      </div>
+    </section>
+
+    <section class="subform">
+      <div class="section-title">
+        <h3>รูปหลักฐาน</h3>
+      </div>
+      <div class="image-preview">
+        ${(ticket.imageLinks || []).map(url => `<img src="${escapeText(url)}" alt="หลักฐาน" loading="lazy">`).join("") || "<p>ยังไม่มีรูปหลักฐาน</p>"}
+      </div>
+    </section>
+
+    <section class="subform">
+      <div class="section-title">
+        <h3>โหวตของแอดมิน</h3>
+        <span class="badge wait">ผิด ${counts.guilty} / ไม่ผิด ${counts.notGuilty}</span>
+      </div>
+      <div class="vote-actions">
+        <button class="danger-button" data-cast-vote="ผิด">โหวตว่าผิด</button>
+        <button class="primary-button" data-cast-vote="ไม่ผิด">โหวตว่าไม่ผิด</button>
+      </div>
+      <p class="muted">${currentVote ? `คุณโหวตแล้ว: ${escapeText(currentVote.vote)}` : "คุณยังไม่ได้โหวต Ticket นี้"}</p>
+      <div class="vote-list">
+        ${(ticket.adminVotes || []).map(vote => `
+          <div class="vote-item">
+            <strong>${escapeText(vote.admin)}</strong>
+            <span class="badge ${verdictClass(vote.vote)}">${escapeText(vote.vote)}</span>
+          </div>
+        `).join("") || "<p>ยังไม่มีแอดมินโหวต</p>"}
+      </div>
+    </section>
+
+    <section class="subform">
+      <div class="section-title"><h3>หมายเหตุ</h3></div>
+      <p>${escapeText(ticket.note || "ไม่มีหมายเหตุ")}</p>
+    </section>
+  `;
+  byId("ticketDetailBody").querySelectorAll("[data-copy-detail]").forEach(button => {
+    button.addEventListener("click", () => copyText(button.dataset.copyDetail));
+  });
+  byId("ticketDetailBody").querySelectorAll("[data-cast-vote]").forEach(button => {
+    button.addEventListener("click", () => castAdminVote(ticket.id, button.dataset.castVote));
+  });
+}
+
+function ensureDetailModal() {
+  if (byId("ticketDetailModal")) return;
+  const modal = document.createElement("dialog");
+  modal.className = "modal";
+  modal.id = "ticketDetailModal";
+  modal.innerHTML = `
+    <section class="modal-card">
+      <header class="modal-head">
+        <div>
+          <p class="eyebrow">Ticket Detail</p>
+          <h2 id="detailTitle">รายละเอียด Ticket</h2>
+        </div>
+        <button class="icon-button close" type="button" data-close-detail title="ปิด" aria-label="ปิด"></button>
+      </header>
+      <div id="ticketDetailBody" class="detail-body"></div>
+    </section>
+  `;
+  document.body.appendChild(modal);
+  modal.querySelector("[data-close-detail]").addEventListener("click", () => modal.close());
+}
+
+function openDetail(id) {
+  ensureDetailModal();
+  const ticket = state.tickets.find(item => item.id === id) || state.archive.find(item => item.id === id);
+  if (!ticket) return;
+  renderDetail(ticket);
+  byId("ticketDetailModal").showModal();
+}
+
+function castAdminVote(id, voteValue) {
+  const ticket = state.tickets.find(item => item.id === id);
+  if (!ticket) {
+    alert("Ticket นี้อยู่ในคลังแล้ว ไม่สามารถโหวตได้");
+    return;
+  }
+  ticket.adminVotes = ticket.adminVotes || [];
+  const admin = getCurrentAdminName();
+  const existing = ticket.adminVotes.find(vote => vote.admin === admin);
+  if (existing) {
+    existing.vote = voteValue;
+    existing.votedAt = new Date().toISOString();
+  } else {
+    ticket.adminVotes.push({ admin, vote: voteValue, votedAt: new Date().toISOString() });
+  }
+  const counts = getVoteCounts(ticket);
+  ticket.votes = counts;
+  if (counts.guilty > counts.notGuilty) ticket.verdict = "ผิด";
+  if (counts.notGuilty > counts.guilty) ticket.verdict = "ไม่ผิด";
+  if (counts.guilty === counts.notGuilty) ticket.verdict = "รอโหวต";
+  saveState();
+  renderTickets();
+  renderDetail(ticket);
 }
 
 function renderTicketMetrics() {
@@ -380,6 +534,9 @@ function initTickets() {
   document.querySelectorAll("[data-close-modal]").forEach(button => button.addEventListener("click", () => {
     byId("ticketModal").close();
   }));
+  document.querySelectorAll("[data-close-detail]").forEach(button => button.addEventListener("click", () => {
+    byId("ticketDetailModal").close();
+  }));
   document.querySelector("[data-action='seed']").addEventListener("click", () => {
     seedData();
     renderTickets();
@@ -402,10 +559,11 @@ function initArchive() {
         <td><span class="badge ${priorityClass(ticket.priority)}">${escapeText(ticket.priority)}</span></td>
         <td><span class="badge ${verdictClass(ticket.verdict)}">${escapeText(ticket.verdict)}</span></td>
         <td>${ticket.discordLinks.map(link => `<button class="ghost-button" data-copy="${escapeText(link)}">Copy</button>`).join(" ")}</td>
-        <td><div class="row-actions"><button data-restore="${ticket.id}">ดึงกลับ</button><button data-delete="${ticket.id}">ลบ</button></div></td>
+        <td><div class="row-actions"><button data-view="${ticket.id}">ดู</button><button data-restore="${ticket.id}">ดึงกลับ</button><button data-delete="${ticket.id}">ลบ</button></div></td>
       </tr>
     `).join("");
     byId("archiveRows").querySelectorAll("[data-copy]").forEach(button => button.addEventListener("click", () => copyText(button.dataset.copy)));
+    byId("archiveRows").querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => openDetail(button.dataset.view)));
     byId("archiveRows").querySelectorAll("[data-restore]").forEach(button => button.addEventListener("click", () => {
       const ticket = state.archive.find(item => item.id === button.dataset.restore);
       state.archive = state.archive.filter(item => item.id !== button.dataset.restore);
