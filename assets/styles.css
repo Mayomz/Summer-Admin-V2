@@ -1017,6 +1017,7 @@ strong {
   align-items: center;
 }
 .sidebar-hover-expand .brand {
+  width: 40px;
   justify-content: center;
 }
 .sidebar-hover-expand .brand > span:not(.brand-mark),
@@ -1026,10 +1027,12 @@ strong {
   transform: translateX(-8px);
 }
 .sidebar-hover-expand .nav {
-  width: 100%;
+  width: 40px;
   padding-top: 48px;
 }
 .sidebar-hover-expand .nav a {
+  width: 40px;
+  min-height: 40px;
   justify-content: center;
   gap: 0;
   padding-inline: 0;
@@ -1041,9 +1044,9 @@ strong {
   margin-inline: auto;
 }
 .sidebar-hover-expand .sidebar-user {
-  width: 48px;
+  width: 40px;
   justify-content: center;
-  padding-inline: 6px;
+  padding-inline: 2px;
 }
 .sidebar-hover-expand .sidebar-user-meta {
   max-width: 0;
@@ -1058,6 +1061,7 @@ strong {
   align-items: stretch;
 }
 .sidebar-hover-expand.sidebar-expanded .brand {
+  width: auto;
   justify-content: flex-start;
 }
 .sidebar-hover-expand.sidebar-expanded .brand > span:not(.brand-mark),
@@ -1067,6 +1071,8 @@ strong {
   transform: translateX(0);
 }
 .sidebar-hover-expand.sidebar-expanded .nav a {
+  width: auto;
+  min-height: 42px;
   justify-content: flex-start;
   gap: 12px;
   padding: 9px 10px;
@@ -1356,6 +1362,7 @@ tbody tr[data-view-row]:hover {
     padding: 22px 14px;
   }
   .sidebar-hover-expand .brand {
+    width: auto;
     justify-content: flex-start;
   }
   .sidebar-hover-expand .brand > span:not(.brand-mark),
@@ -1368,6 +1375,8 @@ tbody tr[data-view-row]:hover {
     width: auto;
   }
   .sidebar-hover-expand .nav a {
+    width: auto;
+    min-height: 42px;
     justify-content: flex-start;
     gap: 12px;
     padding: 9px 10px;
