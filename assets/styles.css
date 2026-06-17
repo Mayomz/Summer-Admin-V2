@@ -1235,12 +1235,20 @@ strong {
   align-items: flex-start;
   min-height: 82px;
   padding-bottom: 18px;
-  padding-right: 64px;
+  padding-right: 92px;
   border-bottom: 0;
 }
 
 .topbar .top-actions {
-  padding-right: 4px;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  min-width: 240px;
+  max-width: min(760px, 100%);
+  padding-right: 0;
+}
+
+.topbar > div:first-child {
+  min-width: 0;
 }
 
 .topbar::after {
