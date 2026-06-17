@@ -593,7 +593,12 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
 .detail-vote-panel {
   grid-column: 2 / 3;
 }
-.detail-links, .vote-list {
+.detail-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.vote-list {
   display: grid;
   gap: 8px;
 }
@@ -607,9 +612,18 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   border-radius: 10px;
   background: #fff;
 }
+.link-row {
+  min-height: 44px;
+  padding: 8px 10px;
+}
+.link-row .ghost-button {
+  min-height: 32px;
+  padding: 0 12px;
+}
 .link-row a {
   color: var(--brand-strong);
   font-weight: 700;
+  font-size: 14px;
   overflow-wrap: anywhere;
 }
 .vote-actions {
@@ -842,6 +856,7 @@ tbody tr[data-view-row]:hover { background: #f9fafb; }
   }
   .metric-grid, .two-column, .detail-grid { grid-template-columns: 1fr 1fr; }
   .detail-body { grid-template-columns: 1fr; }
+  .detail-links { grid-template-columns: 1fr; }
   .detail-links-panel,
   .detail-note-panel,
   .detail-media-panel,
