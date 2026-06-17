@@ -273,6 +273,7 @@ function renderImagePreview() {
 }
 
 function resetTicketForm(ticket = null) {
+  const counts = ticket ? getVoteCounts(ticket) : { guilty: 0, notGuilty: 0 };
   byId("ticketId").value = ticket?.id || "";
   byId("tkNumber").value = ticket?.tkNumber || "";
   byId("reporter").value = ticket?.reporter || "";
@@ -281,9 +282,9 @@ function resetTicketForm(ticket = null) {
   byId("priority").value = ticket?.priority || "กลาง";
   byId("dueDate").value = ticket?.dueDate || todayIso();
   byId("status").value = ticket?.status || "เปิดงาน";
-  byId("verdict").value = ticket?.verdict || "รอโหวต";
-  byId("voteGuilty").value = ticket?.votes?.guilty || 0;
-  byId("voteNotGuilty").value = ticket?.votes?.notGuilty || 0;
+  byId("verdictDisplay").value = ticket?.verdict || "รอโหวต";
+  byId("voteGuilty").value = counts.guilty;
+  byId("voteNotGuilty").value = counts.notGuilty;
   byId("note").value = ticket?.note || "";
   byId("discordLinks").innerHTML = "";
   byId("imageLinks").innerHTML = "";
@@ -294,6 +295,7 @@ function resetTicketForm(ticket = null) {
 
 function ticketFromForm() {
   const oldTicket = state.tickets.find(item => item.id === byId("ticketId").value);
+  const counts = oldTicket ? getVoteCounts(oldTicket) : { guilty: 0, notGuilty: 0 };
   return {
     id: byId("ticketId").value || crypto.randomUUID(),
     tkNumber: byId("tkNumber").value.trim(),
@@ -303,12 +305,12 @@ function ticketFromForm() {
     priority: byId("priority").value,
     dueDate: byId("dueDate").value,
     status: byId("status").value,
-    verdict: byId("verdict").value,
+    verdict: oldTicket?.verdict || "รอโหวต",
     discordLinks: getRowValues("discordLinks"),
     imageLinks: getRowValues("imageLinks"),
     votes: {
-      guilty: Number(byId("voteGuilty").value || 0),
-      notGuilty: Number(byId("voteNotGuilty").value || 0)
+      guilty: counts.guilty,
+      notGuilty: counts.notGuilty
     },
     adminVotes: oldTicket?.adminVotes || [],
     note: byId("note").value.trim()

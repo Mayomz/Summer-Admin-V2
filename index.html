@@ -148,11 +148,7 @@
           </select>
         </label>
         <label>ผลตัดสิน
-          <select id="verdict">
-            <option value="รอโหวต">รอโหวต</option>
-            <option value="ผิด">ผิด</option>
-            <option value="ไม่ผิด">ไม่ผิด</option>
-          </select>
+          <input id="verdictDisplay" value="รอโหวต" readonly>
         </label>
       </div>
 
@@ -179,12 +175,13 @@
         </div>
         <div class="vote-grid">
           <label>ผิด
-            <input id="voteGuilty" type="number" min="0" value="0">
+            <input id="voteGuilty" type="number" min="0" value="0" readonly>
           </label>
           <label>ไม่ผิด
-            <input id="voteNotGuilty" type="number" min="0" value="0">
+            <input id="voteNotGuilty" type="number" min="0" value="0" readonly>
           </label>
         </div>
+        <p class="muted">แก้ไขผลโหวตไม่ได้จากฟอร์มนี้ แอดมินต้องกดโหวตหรือเปลี่ยนโหวตของตัวเองในหน้ารายละเอียด TK</p>
       </section>
 
       <label>หมายเหตุ
