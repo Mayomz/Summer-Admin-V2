@@ -1028,7 +1028,7 @@ strong {
 }
 .sidebar-hover-expand .nav {
   width: 40px;
-  padding-top: 48px;
+  padding-top: 24px;
 }
 .sidebar-hover-expand .nav a {
   width: 40px;
@@ -1069,6 +1069,10 @@ strong {
   max-width: 170px;
   opacity: 1;
   transform: translateX(0);
+}
+.sidebar-hover-expand.sidebar-expanded .nav {
+  width: 100%;
+  padding-top: 48px;
 }
 .sidebar-hover-expand.sidebar-expanded .nav a {
   width: auto;
